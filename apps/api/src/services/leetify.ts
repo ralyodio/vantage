@@ -38,7 +38,7 @@ export class LeetifyService {
       // Get full match history if requested
       let matchHistory: LeetifyMatchDetails[] | undefined;
       if (includeMatchHistory) {
-        matchHistory = await this.getMatchHistory(steamId64, 10, apiKey);
+        matchHistory = await this.getMatchHistory(steamId64, 50, apiKey);
       }
       
       // Return ALL the data from Leetify
@@ -61,7 +61,7 @@ export class LeetifyService {
    * Uses v3 endpoint for CS2 matches
    * Returns basic match data - use getMatchByDataSource for full player stats
    */
-  async getMatchHistory(steamId64: string, limit: number = 10, apiKey?: string): Promise<LeetifyMatchDetails[]> {
+  async getMatchHistory(steamId64: string, limit: number = 50, apiKey?: string): Promise<LeetifyMatchDetails[]> {
     try {
       const headers = this.getHeaders(apiKey);
       
@@ -72,7 +72,7 @@ export class LeetifyService {
       
       const matches = response.data || [];
       
-      // Apply limit (default to 10 recent matches)
+      // Apply limit (default 50 recent matches)
       if (limit && Array.isArray(matches)) {
         return matches.slice(0, limit);
       }

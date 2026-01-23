@@ -3,6 +3,35 @@ import type { FaceitStats } from '@vantage/shared';
 
 const FACEIT_API_BASE = 'https://open.faceit.com/data/v4';
 
+function extractFaceitMap(match: any, matchStatsData?: any): string {
+  const candidates: Array<string | undefined> = [];
+
+  for (const round of matchStatsData?.rounds || []) {
+    const rs = round.round_stats || round.roundStats || {};
+    candidates.push(rs.Map, rs.map, rs['Map Name'], rs.map_name);
+  }
+
+  candidates.push(
+    match?.voting?.map?.pick,
+    Array.isArray(match?.voting?.map?.entities)
+      ? match.voting.map.entities.find((e: any) => e?.class_name || e?.game_map_id)?.class_name
+      : undefined,
+    match?.map,
+    match?.game_map,
+  );
+
+  for (const c of candidates) {
+    if (!c || typeof c !== 'string') continue;
+    const t = c.trim();
+    if (!t) continue;
+    if (/^\d+v\d+$/i.test(t)) continue;
+    if (t.toLowerCase() === 'unknown') continue;
+    return t;
+  }
+
+  return 'Unknown';
+}
+
 export class FaceitService {
   async getStats(steamId64: string, apiKey?: string): Promise<FaceitStats | null> {
     const FACEIT_API_KEY = apiKey || process.env.FACEIT_API_KEY;
@@ -32,13 +61,13 @@ export class FaceitService {
       const lifetime = statsRes.data?.lifetime;
       if (!lifetime) return null;
       
-      // 3. Get match history (last 20 matches)
+      // 3. Get match history (last 40 matches)
       let recentMatches: number = 0;
       let recentWins: number = 0;
       const matchHistory: any[] = [];
       try {
         const historyRes = await axios.get(`${FACEIT_API_BASE}/players/${playerId}/history`, {
-          params: { game: 'cs2', offset: 0, limit: 20 },
+          params: { game: 'cs2', offset: 0, limit: 40 },
           headers: { Authorization: `Bearer ${FACEIT_API_KEY}` },
         });
         
@@ -59,6 +88,7 @@ export class FaceitService {
               // Find player's stats in the match
               let playerStats: any = null;
               const teams: any = { team1: null, team2: null };
+              const mapName = extractFaceitMap(match, matchStatsRes.data);
               
               for (const round of matchStatsRes.data.rounds || []) {
                 const team1Data = round.teams?.[0];
@@ -144,7 +174,7 @@ export class FaceitService {
                 matchHistory.push({
                   matchId: match.match_id,
                   date: new Date(match.finished_at * 1000),
-                  map: match.game_mode || 'Unknown',
+                  map: mapName,
                   result: isWin ? 'win' : 'loss',
                   score: `${match.results?.score?.faction1 || 0}-${match.results?.score?.faction2 || 0}`,
                   kills,

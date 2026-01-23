@@ -1,12 +1,29 @@
+export interface SteamFavoriteBadge {
+  name: string;
+  xp?: string;
+  level?: number;
+  description?: string;
+  icon?: string;
+}
+
+export interface SteamProfileBackground {
+  image?: string;
+  videoMp4?: string;
+  videoWebm?: string;
+}
+
 export interface SteamProfile {
   steamId64: string;
   steamId32?: string;
+  accountId?: number;
   username: string;
   realName?: string;
   avatar?: string;
   profileUrl: string;
   accountCreated?: Date | string;
   level?: number;
+  /** Steam CSS level class e.g. "friendPlayerLevel lvl_50" */
+  levelClass?: string;
   yearsOfService?: number;
   isPrime: boolean;
   isPrivate: boolean;
@@ -14,12 +31,33 @@ export interface SteamProfile {
   gameBanned: boolean;
   communityBanned?: boolean;
   country?: string;
+  state?: string;
   daysSinceLastBan?: number;
+  friendCount?: number;
+  gameCount?: number;
+  /** Equipped avatar frame (PNG URL) */
+  avatarFrame?: string;
+  /** Mini-profile / equipped profile background */
+  profileBackground?: SteamProfileBackground;
+  favoriteBadge?: SteamFavoriteBadge;
   cs2Stats?: {
     hoursPlayed?: number;
-    winRate?: number;
+    hoursLast2Weeks?: number;
+    lastPlayed?: Date | string | number;
+    achievementsUnlocked?: number;
+    totalAchievements?: number;
+    achievementPercentage?: number;
     totalKills?: number;
+    totalDeaths?: number;
+    kdRatio?: number;
+    totalWins?: number;
     totalMatches?: number;
+    winRate?: number;
+    totalRoundsPlayed?: number;
+    totalDamage?: number;
+    totalMoneyEarned?: number;
+    totalMVPs?: number;
+    headshotPercentage?: number;
   };
 }
 
@@ -27,11 +65,30 @@ export interface FaceitStats {
   playerId: string;
   nickname: string;
   avatar: string;
+  country?: string;
+  verified?: boolean;
+  membershipType?: string;
+  steamId64?: string;
   elo: number;
   level: number;
+  region?: string;
   matches: number;
+  wins?: number;
   winRate: number;
+  totalKills?: number;
+  totalDeaths?: number;
+  avgKills?: number;
+  avgDeaths?: number;
   avgKD: number;
+  avgHeadshotPercent?: number;
+  totalHeadshots?: number;
+  avgMVPs?: number;
+  avgTripleKills?: number;
+  avgQuadroKills?: number;
+  avgPentaKills?: number;
+  recentMatches?: number;
+  recentWins?: number;
+  recentWinRate?: number;
   hasBan?: boolean;
   activeBans?: Array<{ reason: string; duration: string }>;
   accountAge?: number;
@@ -50,8 +107,8 @@ export interface LeetifyRating {
   utility: number;
   clutch: number;
   opening: number;
-  ct_leetify: number;  // CT-side performance rating (normalized around 0)
-  t_leetify: number;   // T-side performance rating (normalized around 0)
+  ct_leetify: number;
+  t_leetify: number;
 }
 
 export interface LeetifyDetailedStats {
@@ -96,11 +153,12 @@ export interface LeetifyPlayerMatchStats {
   trade_kills_succeed: number;
   trade_kill_attempts: number;
   trade_kills_success_percentage: number;
-  // Fallbacks
   kills?: number;
   deaths?: number;
   assists?: number;
   damage_per_round?: number;
+  avatar?: string;
+  steam_username?: string;
 }
 
 export interface LeetifyMatchDetails {
@@ -152,10 +210,19 @@ export interface LeetifyStats {
 export interface MatchPlayer {
   playerId: string;
   nickname: string;
+  avatar?: string;
   kills: number;
   deaths: number;
   assists: number;
   kd: number;
+  kr?: number;
+  hs?: number;
+  hsPercent?: number;
+  mvps?: number;
+  tripleKills?: number;
+  quadroKills?: number;
+  pentaKills?: number;
+  result?: number;
 }
 
 export interface MatchTeam {
@@ -175,12 +242,22 @@ export interface MatchStats {
   deaths: number;
   assists: number;
   kd: number;
+  kr?: number;
+  hs?: number;
   hsPercent: number;
+  mvps?: number;
+  tripleKills?: number;
+  quadroKills?: number;
+  pentaKills?: number;
+  gameMode?: string;
+  faceitElo?: number;
   eloChange?: number;
   teams?: {
     team1: MatchTeam;
     team2: MatchTeam;
   };
+  rounds?: number;
+  matchUrl?: string;
 }
 
 export interface RiskFlag {
@@ -222,7 +299,7 @@ export interface WingmanStats {
 
 export interface UserProfile {
   steam: SteamProfile;
-  faceit?: FaceitStats | null;  // null = explicitly not found (404), undefined = not checked yet
+  faceit?: FaceitStats | null;
   leetify?: LeetifyStats | null;
   premier?: PremierStats | null;
   competitive?: CompetitiveStats | null;

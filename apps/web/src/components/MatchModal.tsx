@@ -1,9 +1,27 @@
 "use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
-import { HiX, HiTrendingUp, HiTrendingDown, HiLightningBolt, HiChartBar, HiFire } from 'react-icons/hi';
-import { GiExplosiveMaterials, GiSmokeBomb, GiFlashGrenade } from 'react-icons/gi';
+import { useEffect, useMemo } from 'react';
+import { createPortal } from 'react-dom';
+import { AnimatePresence, motion } from 'framer-motion';
 import type { MatchStats } from '@vantage/shared';
+import {
+  getMapDisplayName,
+  getMapIcon,
+  getSourceLogo,
+  LOGOS,
+} from '../lib/map-assets';
+
+function sideIcon(side: 'ct' | 't' | 'neutral') {
+  if (side === 'ct') return LOGOS.ct;
+  if (side === 't') return LOGOS.t;
+  return null;
+}
+
+export type FocusPlayer = {
+  steam64?: string;
+  nickname?: string;
+  avatar?: string;
+};
 
 interface Props {
   isOpen: boolean;
@@ -11,400 +29,715 @@ interface Props {
   match: any;
   type: 'faceit' | 'leetify';
   loading?: boolean;
+  focusPlayer?: FocusPlayer | null;
 }
 
-export default function MatchModal({ isOpen, onClose, match, type, loading }: Props) {
-  if (!match && !loading) return null;
+type Row = {
+  id: string;
+  name: string;
+  avatar?: string;
+  steam64?: string;
+  k: number;
+  d: number;
+  a: number;
+  kd: number;
+  adr: number | null;
+  hs: number | null;
+  mvp: number | null;
+  rating: number | null;
+  multi: string | null;
+};
 
-  const map = type === 'faceit' ? match?.map : match?.map_name;
-  const dateStr = type === 'faceit' 
-    ? new Date(match?.date).toLocaleDateString()
-    : new Date(match?.finished_at).toLocaleDateString();
-  
-  return (
+type Team = {
+  name: string;
+  score: number;
+  won: boolean;
+  side: 'ct' | 't' | 'neutral';
+  players: Row[];
+};
+
+export default function MatchModal({
+  isOpen,
+  onClose,
+  match,
+  type,
+  loading,
+  focusPlayer,
+}: Props) {
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+    };
+  }, [isOpen, onClose]);
+
+  if (typeof document === 'undefined') return null;
+
+  return createPortal(
     <AnimatePresence>
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <motion.div 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center sm:p-6">
+          <motion.button
+            type="button"
+            aria-label="Close scoreboard"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            onClick={onClose} 
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm" 
+            className="absolute inset-0 bg-black/80"
+            onClick={onClose}
           />
-          
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }} 
-            animate={{ opacity: 1, scale: 1 }} 
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.2 }}
-            className="relative bg-card w-full max-w-7xl max-h-[90vh] rounded-xl border border-white/10 shadow-2xl flex flex-col"
-          >
-            {/* Header */}
-            <div className="px-6 py-4 border-b border-white/10 flex justify-between items-center bg-zinc-900/50">
-              <div className="flex items-center gap-4">
-                <div className="p-2 bg-zinc-800 rounded-lg">
-                  <HiChartBar className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-xl font-bold text-foreground">{map || 'Match Details'}</h3>
-                  <p className="text-xs text-muted-foreground flex items-center gap-2">
-                    <span className="capitalize">{type}</span>
-                    {!loading && <span>•</span>}
-                    {!loading && <span>{dateStr}</span>}
-                  </p>
-                </div>
-              </div>
-              <button 
-                onClick={onClose} 
-                className="p-2 hover:bg-zinc-800 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
-              >
-                <HiX className="w-5 h-5" />
-              </button>
-            </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
-              {loading ? (
-                <div className="flex items-center justify-center py-32">
-                  <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-14 w-14 border-4 border-zinc-800 border-t-primary mb-4"></div>
-                    <p className="text-sm text-muted-foreground font-medium">Loading full match details...</p>
-                  </div>
-                </div>
-              ) : type === 'faceit' 
-                ? <FaceitTable match={match} /> 
-                : <LeetifyTable match={match} />
-              }
-            </div>
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Match scoreboard"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: 12 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full sm:max-w-[720px] max-h-[100dvh] sm:max-h-[min(860px,90vh)] bg-[#101114] sm:rounded-lg border-t sm:border border-[#2a2c32] shadow-2xl flex flex-col overflow-hidden"
+          >
+            {loading || !match ? (
+              <LoadingState onClose={onClose} />
+            ) : (
+              <Board
+                match={match}
+                type={type}
+                focus={focusPlayer}
+                onClose={onClose}
+              />
+            )}
           </motion.div>
         </div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 }
 
-function FaceitTable({ match }: { match: MatchStats }) {
-  const { team1, team2 } = match.teams || {};
-  if (!team1 || !team2) return <div className="text-center text-muted-foreground py-8">No data available</div>;
-
+function LoadingState({ onClose }: { onClose: () => void }) {
   return (
-    <div className="space-y-6">
-      <CS2TeamCard team={team1} label="Team 1" color="blue" isFaceit={true} />
-      <CS2TeamCard team={team2} label="Team 2" color="amber" isFaceit={true} />
+    <div className="p-8 flex flex-col items-center justify-center gap-3 min-h-[200px]">
+      <div className="h-5 w-5 rounded-full border-2 border-[#3a3c44] border-t-[#c4c7ce] animate-spin" />
+      <p className="text-sm text-[#8b8f98]">Loading scoreboard…</p>
+      <button
+        type="button"
+        onClick={onClose}
+        className="mt-2 text-xs text-[#8b8f98] hover:text-white"
+      >
+        Cancel
+      </button>
     </div>
   );
 }
 
-function LeetifyTable({ match }: { match: any }) {
-  const t1 = match.stats.filter((p: any) => p.initial_team_number === 2);
-  const t2 = match.stats.filter((p: any) => p.initial_team_number === 3);
-  const s1 = match.team_scores.find((s: any) => s.team_number === 2)?.score || 0;
-  const s2 = match.team_scores.find((s: any) => s.team_number === 3)?.score || 0;
-
-  return (
-    <div className="space-y-6">
-      <CS2TeamCard team={{ players: t1, score: s1, won: s1 > s2 }} label="Team 1" color="blue" />
-      <CS2TeamCard team={{ players: t2, score: s2, won: s2 > s1 }} label="Team 2" color="amber" />
-    </div>
+function Board({
+  match,
+  type,
+  focus,
+  onClose,
+}: {
+  match: any;
+  type: 'faceit' | 'leetify';
+  focus?: FocusPlayer | null;
+  onClose: () => void;
+}) {
+  const mapName = getMapDisplayName(
+    type === 'faceit' ? match.map : match.map_name
   );
-}
+  const mapIcon = getMapIcon(type === 'faceit' ? match.map : match.map_name);
+  const sourceLogo =
+    type === 'faceit' ? LOGOS.faceit : getSourceLogo(match.data_source || 'leetify');
+  const sourceName =
+    type === 'faceit'
+      ? 'FACEIT'
+      : String(match.data_source || match.matchmaking_source || 'Match').replace(
+          /_/g,
+          ' '
+        );
 
-function TeamCard({ team, label, isLeetify, color }: any) {
-  const totalKills = team.players.reduce((sum: number, p: any) => sum + (p.kills || p.total_kills || 0), 0);
-  const totalDeaths = team.players.reduce((sum: number, p: any) => sum + (p.deaths || p.total_deaths || 0), 0);
-  const teamKD = totalDeaths > 0 ? (totalKills / totalDeaths).toFixed(2) : totalKills.toFixed(2);
-  
-  const colorClasses = color === 'blue' 
-    ? 'border-blue-500/20 bg-blue-500/5'
-    : color === 'amber'
-    ? 'border-amber-500/20 bg-amber-500/5'
-    : 'border-zinc-700 bg-zinc-900/30';
+  const when = (() => {
+    const raw = type === 'faceit' ? match.date : match.finished_at;
+    if (!raw) return null;
+    try {
+      return new Date(raw).toLocaleDateString(undefined, {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+      });
+    } catch {
+      return null;
+    }
+  })();
 
-  return (
-    <div className={`rounded-xl border ${colorClasses} overflow-hidden`}>
-      {/* Team Header */}
-      <div className="px-5 py-4 bg-zinc-900/60 border-b border-white/5">
-        <div className="flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            {team.won ? (
-              <HiTrendingUp className="w-6 h-6 text-emerald-500" />
-            ) : (
-              <HiTrendingDown className="w-6 h-6 text-zinc-500" />
-            )}
-            <div>
-              <h4 className="text-lg font-bold text-foreground">{label}</h4>
-              <p className="text-xs text-muted-foreground">Team K/D: {teamKD}</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <div className={`text-4xl font-black font-mono ${team.won ? 'text-emerald-500' : 'text-zinc-500'}`}>
-              {team.score}
-            </div>
-            <p className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider">
-              {team.won ? 'Victory' : 'Defeat'}
-            </p>
-          </div>
-        </div>
+  const duration =
+    type === 'leetify' && match.duration_seconds
+      ? formatDuration(match.duration_seconds)
+      : null;
+
+  const teams = useMemo(
+    () => (type === 'faceit' ? fromFaceit(match) : fromLeetify(match)),
+    [match, type]
+  );
+
+  const matchFocus = (p: Row) => {
+    if (!focus) return false;
+    if (focus.steam64 && p.steam64 && focus.steam64 === p.steam64) return true;
+    if (focus.nickname && p.name.toLowerCase() === focus.nickname.toLowerCase())
+      return true;
+    return false;
+  };
+
+  // Put the team containing the focused player first
+  const ordered = useMemo(() => {
+    if (!teams.length) return teams;
+    const idx = teams.findIndex((t) => t.players.some(matchFocus));
+    if (idx <= 0) return teams;
+    return [teams[idx], ...teams.filter((_, i) => i !== idx)];
+  }, [teams, focus]);
+
+  if (!ordered.length) {
+    return (
+      <div className="p-10 text-center">
+        <p className="text-sm text-[#8b8f98]">No scoreboard data for this match.</p>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-4 text-xs text-white underline"
+        >
+          Close
+        </button>
       </div>
+    );
+  }
 
-      {/* Players Table */}
-      <div className="p-4">
-        <div className="space-y-2">
-          {team.players
-            .sort((a: any, b: any) => (b.total_kills || b.kills || 0) - (a.total_kills || a.kills || 0))
-            .map((p: any, i: number) => (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }}
-              className="flex items-center gap-4 p-3 bg-zinc-900/40 hover:bg-zinc-800/60 rounded-lg border border-white/5 transition-colors"
+  const [teamA, teamB] = [ordered[0], ordered[1]];
+
+  return (
+    <>
+      {/* Header */}
+      <header className="shrink-0 border-b border-[#2a2c32] bg-[#14161a]">
+        <div className="flex items-center justify-between gap-3 px-4 py-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <img
+              src={mapIcon}
+              alt=""
+              className="w-9 h-9 object-contain shrink-0"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/maps/icons/unknown.svg';
+              }}
+            />
+            <div className="min-w-0">
+              <div className="text-[15px] font-semibold text-[#f0f1f3] truncate">
+                {mapName}
+              </div>
+              <div className="flex flex-wrap items-center gap-x-1.5 text-[11px] text-[#8b8f98] mt-0.5">
+                <img src={sourceLogo} alt="" className="w-3 h-3 inline" />
+                <span className="capitalize">{sourceName}</span>
+                {when && (
+                  <>
+                    <span className="text-[#3a3c44]">·</span>
+                    <span>{when}</span>
+                  </>
+                )}
+                {duration && (
+                  <>
+                    <span className="text-[#3a3c44]">·</span>
+                    <span>{duration}</span>
+                  </>
+                )}
+              </div>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="shrink-0 h-8 px-3 rounded text-xs font-medium text-[#c4c7ce] bg-[#1c1e24] border border-[#2a2c32] hover:bg-[#252830] hover:text-white transition-colors"
+          >
+            Close
+          </button>
+        </div>
+
+        {/* Final score */}
+        <div className="flex items-center justify-center gap-4 sm:gap-6 px-4 pb-4 pt-1">
+          <SideLabel team={teamA} align="right" />
+          <div className="flex items-baseline gap-2 tabular-nums">
+            <span
+              className={`text-[40px] sm:text-[48px] font-bold leading-none tracking-tight ${
+                teamA?.won ? 'text-white' : 'text-[#6b6f78]'
+              }`}
             >
-              {/* Rank Badge */}
-              <div className="flex-shrink-0 w-8 h-8 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center">
-                <span className="text-xs font-bold text-muted-foreground">#{i + 1}</span>
-              </div>
-
-              {/* Player Name */}
-              <div className="flex-1 min-w-0">
-                <div className="font-bold text-sm text-foreground truncate">
-                  {p.nickname || p.name}
-                </div>
-                {isLeetify && (
-                  <div className="flex items-center gap-2 mt-0.5">
-                    <HiLightningBolt className="w-3 h-3 text-primary" />
-                    <span className="text-[10px] font-mono text-muted-foreground">
-                      Rating: {((p.leetify_rating || 0) * 100).toFixed(0)}
-                    </span>
-                  </div>
-                )}
-              </div>
-
-              {/* Stats Grid */}
-              <div className="flex gap-3 items-center">
-                <StatPill label="K" value={p.kills || p.total_kills} color="emerald" />
-                <StatPill label="D" value={p.deaths || p.total_deaths} color="rose" />
-                <StatPill label="A" value={p.assists || p.total_assists || 0} color="blue" />
-                {!isLeetify && (
-                  <div className="px-3 py-1.5 bg-zinc-800 rounded-md border border-white/10">
-                    <div className="text-xs font-mono font-bold text-foreground">
-                      {p.kd?.toFixed(2)}
-                    </div>
-                    <div className="text-[8px] text-muted-foreground uppercase">K/D</div>
-                  </div>
-                )}
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function StatPill({ label, value, color }: { label: string; value: number; color: 'emerald' | 'rose' | 'blue' }) {
-  const colorClass = color === 'emerald' 
-    ? 'text-emerald-500' 
-    : color === 'rose' 
-    ? 'text-rose-500' 
-    : 'text-blue-500';
-
-  return (
-    <div className="flex flex-col items-center min-w-[36px]">
-      <div className={`text-base font-mono font-bold ${colorClass}`}>
-        {value}
-      </div>
-      <div className="text-[8px] text-muted-foreground uppercase font-bold">
-        {label}
-      </div>
-    </div>
-  );
-}
-
-function CS2TeamCard({ team, label, color, isFaceit }: any) {
-  const colorClasses = color === 'blue' 
-    ? 'border-blue-500/30 bg-gradient-to-br from-blue-500/5 to-transparent'
-    : 'border-amber-500/30 bg-gradient-to-br from-amber-500/5 to-transparent';
-  
-  const textColor = color === 'blue' ? 'text-blue-400' : 'text-amber-400';
-  const bgColor = color === 'blue' ? 'bg-blue-500/10' : 'bg-amber-500/10';
-
-  return (
-    <div className={`rounded-xl border ${colorClasses} overflow-hidden`}>
-      {/* Team Header */}
-      <div className="px-5 py-3 bg-zinc-900/80 border-b border-white/5 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <div className={`px-3 py-1 ${bgColor} rounded-md`}>
-            <span className={`text-sm font-black ${textColor} uppercase tracking-wider`}>
-              {label}
+              {teamA?.score ?? 0}
+            </span>
+            <span className="text-[#3a3c44] text-2xl font-light pb-1">:</span>
+            <span
+              className={`text-[40px] sm:text-[48px] font-bold leading-none tracking-tight ${
+                teamB?.won ? 'text-white' : 'text-[#6b6f78]'
+              }`}
+            >
+              {teamB?.score ?? 0}
             </span>
           </div>
-          <span className="text-xs text-muted-foreground">{team.players.length} Players</span>
+          <SideLabel team={teamB} align="left" />
         </div>
-        <div className="flex items-center gap-3">
-          {team.won ? (
-            <HiTrendingUp className="w-5 h-5 text-emerald-500" />
-          ) : (
-            <HiTrendingDown className="w-5 h-5 text-zinc-500" />
-          )}
-          <div className={`text-3xl font-black font-mono ${team.won ? 'text-emerald-500' : 'text-zinc-500'}`}>
-            {team.score}
-          </div>
-        </div>
+      </header>
+
+      {/* Teams */}
+      <div className="flex-1 overflow-y-auto overscroll-contain">
+        {ordered.map((team, i) => (
+          <TeamBlock
+            key={i}
+            team={team}
+            isFaceit={type === 'faceit'}
+            matchFocus={matchFocus}
+            focusAvatar={focus?.avatar}
+          />
+        ))}
       </div>
 
-      {/* CS2-Style Scoreboard */}
-      <div className="p-4">
-        <div className="space-y-1">
-          {/* Header Row */}
-          <div className="grid grid-cols-[auto_1fr_repeat(10,auto)] gap-2 px-3 py-2 text-[10px] font-bold text-muted-foreground uppercase tracking-wider border-b border-white/5">
-            <div className="w-8"></div>
-            <div>Player</div>
-            <div className="text-center w-12">K</div>
-            <div className="text-center w-12">A</div>
-            <div className="text-center w-12">D</div>
-            <div className="text-center w-14">K/D</div>
-            <div className="text-center w-14">{isFaceit ? 'K/R' : 'ADR'}</div>
-            <div className="text-center w-14">HS%</div>
-            <div className="text-center w-12">MVP</div>
-            <div className="text-center w-12">3K</div>
-            <div className="text-center w-12">4K</div>
-            <div className="text-center w-12">5K</div>
-          </div>
+      {(match.demo_url || match.replay_url || match.matchUrl) && (
+        <footer className="shrink-0 border-t border-[#2a2c32] bg-[#14161a] px-4 py-2.5 flex flex-wrap gap-4">
+          {match.demo_url && (
+            <a
+              href={match.demo_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[#c4c7ce] hover:text-white"
+            >
+              Demo
+            </a>
+          )}
+          {match.replay_url && (
+            <a
+              href={match.replay_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[#c4c7ce] hover:text-white"
+            >
+              Replay
+            </a>
+          )}
+          {match.matchUrl && (
+            <a
+              href={match.matchUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-[#c4c7ce] hover:text-white"
+            >
+              FACEIT room
+            </a>
+          )}
+        </footer>
+      )}
+    </>
+  );
+}
 
-          {/* Player Rows */}
-          {team.players
-            .sort((a: any, b: any) => (b.kills || b.total_kills || 0) - (a.kills || a.total_kills || 0))
-            .map((p: any, i: number) => {
-              const kills = p.kills || p.total_kills || 0;
-              const deaths = p.deaths || p.total_deaths || 0;
-              const assists = p.assists || p.total_assists || 0;
-              const kd = p.kd || p.kd_ratio || 0;
-              const secondaryStat = isFaceit ? (p.kr || 0).toFixed(2) : Math.round(p.dpr || 0);
-              const hsPercent = isFaceit 
-                ? (p.hsPercent || 0)
-                : (p.total_hs_kills && p.total_kills ? Math.round((p.total_hs_kills / p.total_kills) * 100) : 0);
-              const mvps = p.mvps || 0;
-              const tripleKills = p.tripleKills || p.multi3k || 0;
-              const quadroKills = p.quadroKills || p.multi4k || 0;
-              const pentaKills = p.pentaKills || p.multi5k || 0;
+function SideLabel({
+  team,
+  align,
+}: {
+  team?: Team;
+  align: 'left' | 'right';
+}) {
+  if (!team) return <div className="w-[4.5rem] sm:w-24" />;
+  const color =
+    team.side === 'ct'
+      ? 'text-[#5b9fd4]'
+      : team.side === 't'
+        ? 'text-[#c9a227]'
+        : 'text-[#c4c7ce]';
 
-              return (
-                <motion.div
-                  key={isFaceit ? p.playerId : p.steam64_id}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  className="grid grid-cols-[auto_1fr_repeat(10,auto)] gap-2 px-3 py-2.5 bg-zinc-900/40 hover:bg-zinc-800/60 rounded-lg border border-white/5 transition-all hover:border-white/10 items-center"
-                >
-                  {/* Avatar */}
-                  <div className="w-8 h-8 rounded-full overflow-hidden bg-zinc-800 border-2 border-white/10 flex-shrink-0">
-                    {p.avatar ? (
-                      <img src={p.avatar} alt={p.nickname || p.name} className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="w-full h-full flex items-center justify-center text-xs font-bold text-muted-foreground">
-                        {(p.nickname || p.name)?.[0]?.toUpperCase() || '?'}
-                      </div>
-                    )}
-                  </div>
+  const icon = sideIcon(team.side);
 
-                  {/* Player Name */}
-                  <div className="flex flex-col min-w-0">
-                    <div className="font-bold text-sm text-foreground truncate">
-                      {p.nickname || p.steam_username || p.name}
-                    </div>
-                    {!isFaceit && (
-                      <div className="flex items-center gap-2 mt-0.5">
-                        <HiLightningBolt className="w-3 h-3 text-primary" />
-                        <span className="text-[10px] font-mono text-muted-foreground">
-                          {Math.round((p.leetify_rating || 0) * 100)}
-                        </span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Stats */}
-                  <div className="text-center w-12 font-mono font-bold text-emerald-500">{kills}</div>
-                  <div className="text-center w-12 font-mono font-bold text-blue-500">{assists}</div>
-                  <div className="text-center w-12 font-mono font-bold text-rose-500">{deaths}</div>
-                  <div className="text-center w-14 font-mono font-bold text-foreground">{typeof kd === 'number' ? kd.toFixed(2) : kd}</div>
-                  <div className="text-center w-14 font-mono font-bold text-orange-500">{secondaryStat}</div>
-                  <div className="text-center w-14 font-mono font-bold text-yellow-500">{hsPercent}%</div>
-                  <div className="text-center w-12">
-                    <div className={`inline-flex items-center justify-center w-7 h-7 rounded ${mvps > 0 ? 'bg-yellow-500/20 text-yellow-500' : 'bg-zinc-800 text-zinc-600'}`}>
-                      <span className="text-xs font-bold">{mvps}</span>
-                    </div>
-                  </div>
-                  <div className="text-center w-12 font-mono text-xs text-muted-foreground">{tripleKills}</div>
-                  <div className="text-center w-12 font-mono text-xs text-muted-foreground">{quadroKills}</div>
-                  <div className="text-center w-12">
-                    {pentaKills > 0 ? (
-                      <div className="inline-flex items-center justify-center px-2 py-1 bg-red-500/20 text-red-500 rounded font-bold text-xs">
-                        {pentaKills}
-                      </div>
-                    ) : (
-                      <span className="font-mono text-xs text-zinc-600">0</span>
-                    )}
-                  </div>
-                </motion.div>
-              );
-            })}
-        </div>
-
-        {/* Team Stats Summary */}
-        {!isFaceit && (
-          <div className="mt-4 p-4 bg-zinc-900/60 rounded-lg border border-white/5">
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <TeamStatBox
-                icon={<HiFire className="w-4 h-4" />}
-                label="Total Kills"
-                value={team.players.reduce((sum: number, p: any) => sum + (p.total_kills || 0), 0)}
-                color="emerald"
-              />
-              <TeamStatBox
-                icon={<GiExplosiveMaterials className="w-4 h-4" />}
-                label="HE Grenades"
-                value={team.players.reduce((sum: number, p: any) => sum + (p.he_thrown || 0), 0)}
-                color="orange"
-              />
-              <TeamStatBox
-                icon={<GiSmokeBomb className="w-4 h-4" />}
-                label="Smokes"
-                value={team.players.reduce((sum: number, p: any) => sum + (p.smoke_thrown || 0), 0)}
-                color="zinc"
-              />
-              <TeamStatBox
-                icon={<GiFlashGrenade className="w-4 h-4" />}
-                label="Flashbangs"
-                value={team.players.reduce((sum: number, p: any) => sum + (p.flashbang_thrown || 0), 0)}
-                color="yellow"
-              />
-            </div>
-          </div>
+  return (
+    <div
+      className={`w-[4.5rem] sm:w-28 min-w-0 ${
+        align === 'right' ? 'text-right' : 'text-left'
+      }`}
+    >
+      <div
+        className={`text-[11px] font-bold uppercase tracking-wider ${color} inline-flex items-center gap-1 ${
+          align === 'right' ? 'flex-row-reverse' : ''
+        }`}
+      >
+        {icon && <img src={icon} alt="" className="w-4 h-4 shrink-0" />}
+        {team.name}
+      </div>
+      <div className="text-[10px] mt-0.5 font-semibold uppercase tracking-wide">
+        {team.won ? (
+          <span className="text-[#3dd68c]">Win</span>
+        ) : (
+          <span className="text-[#6b6f78]">Loss</span>
         )}
       </div>
     </div>
   );
 }
 
-function TeamStatBox({ icon, label, value, color }: { icon: React.ReactNode; label: string; value: number; color: string }) {
-  const colorClasses = {
-    emerald: 'text-emerald-500',
-    orange: 'text-orange-500',
-    zinc: 'text-zinc-400',
-    yellow: 'text-yellow-500',
-  }[color] || 'text-foreground';
+function TeamBlock({
+  team,
+  isFaceit,
+  matchFocus,
+  focusAvatar,
+}: {
+  team: Team;
+  isFaceit: boolean;
+  matchFocus: (p: Row) => boolean;
+  focusAvatar?: string;
+}) {
+  const accent =
+    team.side === 'ct'
+      ? 'bg-[#5b9fd4]'
+      : team.side === 't'
+        ? 'bg-[#c9a227]'
+        : 'bg-[#6b6f78]';
+  const headBg =
+    team.side === 'ct'
+      ? 'bg-[#5b9fd4]/[0.07]'
+      : team.side === 't'
+        ? 'bg-[#c9a227]/[0.07]'
+        : 'bg-white/[0.02]';
+
+  const maxK = Math.max(...team.players.map((p) => p.k), 0);
 
   return (
-    <div className="flex items-center gap-3">
-      <div className={`p-2 bg-zinc-800 rounded-lg ${colorClasses}`}>
-        {icon}
+    <section className="border-b border-[#2a2c32] last:border-0">
+      <div
+        className={`flex items-center justify-between px-3 sm:px-4 py-1.5 ${headBg}`}
+      >
+        <div className="flex items-center gap-2">
+          <span className={`w-0.5 h-3.5 rounded-full ${accent}`} />
+          {sideIcon(team.side) && (
+            <img src={sideIcon(team.side)!} alt="" className="w-4 h-4 shrink-0" />
+          )}
+          <span className="text-[11px] font-bold uppercase tracking-wider text-[#c4c7ce]">
+            {team.name}
+          </span>
+        </div>
+        <span
+          className={`text-lg font-bold tabular-nums ${
+            team.won ? 'text-white' : 'text-[#6b6f78]'
+          }`}
+        >
+          {team.score}
+        </span>
       </div>
-      <div>
-        <div className="text-xs text-muted-foreground">{label}</div>
-        <div className={`text-lg font-mono font-bold ${colorClasses}`}>{value}</div>
+
+      <div className="overflow-x-auto">
+      <table className="w-full min-w-[20rem] border-collapse">
+        <thead>
+          <tr className="text-[10px] font-semibold uppercase tracking-wider text-[#6b6f78]">
+            <th className="text-left font-semibold pl-3 sm:pl-4 pr-2 py-1.5">
+              Player
+            </th>
+            <th className="text-right font-semibold px-1.5 py-1.5 w-8">K</th>
+            <th className="text-right font-semibold px-1.5 py-1.5 w-8">A</th>
+            <th className="text-right font-semibold px-1.5 py-1.5 w-8">D</th>
+            <th className="text-right font-semibold px-1.5 py-1.5 w-10">+/-</th>
+            <th className="text-right font-semibold px-1.5 py-1.5 w-11">K/D</th>
+            {!isFaceit && (
+              <th className="text-right font-semibold px-1.5 py-1.5 w-10">ADR</th>
+            )}
+            <th className="text-right font-semibold px-1.5 py-1.5 w-10">HS%</th>
+            {!isFaceit && (
+              <th className="text-right font-semibold px-1.5 pr-3 sm:pr-4 py-1.5 w-12">
+                RTG
+              </th>
+            )}
+            {isFaceit && (
+              <th className="text-right font-semibold px-1.5 py-1.5 w-9">MVP</th>
+            )}
+            {isFaceit && (
+              <th className="text-right font-semibold px-1.5 pr-3 sm:pr-4 py-1.5 w-14">
+                3/4/5
+              </th>
+            )}
+          </tr>
+        </thead>
+        <tbody>
+          {team.players.map((p) => {
+            const you = matchFocus(p);
+            const diff = p.k - p.d;
+            const top = p.k === maxK && maxK > 0;
+            const av = p.avatar || (you ? focusAvatar : undefined);
+
+            return (
+              <tr
+                key={p.id}
+                className={`border-t border-[#1a1c22] ${
+                  you
+                    ? 'bg-[#6d5cff]/[0.12]'
+                    : 'hover:bg-white/[0.02]'
+                }`}
+              >
+                <td
+                  className={`pl-3 sm:pl-4 pr-2 py-2 ${
+                    you ? 'shadow-[inset_2px_0_0_0_#8b7cf7]' : ''
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    {av ? (
+                      <img
+                        src={av}
+                        alt=""
+                        className={`w-6 h-6 rounded-sm object-cover bg-[#1c1e24] shrink-0 ${
+                          you ? 'ring-1 ring-[#8b7cf7]' : ''
+                        }`}
+                      />
+                    ) : (
+                      <div
+                        className={`w-6 h-6 rounded-sm bg-[#1c1e24] shrink-0 flex items-center justify-center text-[10px] font-bold text-[#6b6f78] ${
+                          you ? 'ring-1 ring-[#8b7cf7]' : ''
+                        }`}
+                      >
+                        {p.name.charAt(0).toUpperCase()}
+                      </div>
+                    )}
+                    <div className="min-w-0 flex items-center gap-1.5">
+                      {p.steam64 ? (
+                        <a
+                          href={`/profile/${p.steam64}`}
+                          onClick={(e) => e.stopPropagation()}
+                          className={`text-[13px] font-medium truncate max-w-[9rem] sm:max-w-[14rem] hover:underline ${
+                            you ? 'text-[#e4e0ff]' : 'text-[#e8e9ec]'
+                          }`}
+                        >
+                          {p.name}
+                        </a>
+                      ) : (
+                        <span
+                          className={`text-[13px] font-medium truncate max-w-[9rem] sm:max-w-[14rem] ${
+                            you ? 'text-[#e4e0ff]' : 'text-[#e8e9ec]'
+                          }`}
+                        >
+                          {p.name}
+                        </span>
+                      )}
+                      {you && (
+                        <span className="shrink-0 text-[9px] font-bold uppercase tracking-wide text-[#c4b5fd] bg-[#6d5cff]/25 px-1 py-px rounded">
+                          You
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                </td>
+                <td
+                  className={`text-right tabular-nums text-[13px] px-1.5 py-2 ${
+                    top ? 'text-white font-bold' : 'text-[#e8e9ec] font-medium'
+                  }`}
+                >
+                  {p.k}
+                </td>
+                <td className="text-right tabular-nums text-[13px] px-1.5 py-2 text-[#8b8f98]">
+                  {p.a}
+                </td>
+                <td className="text-right tabular-nums text-[13px] px-1.5 py-2 text-[#8b8f98]">
+                  {p.d}
+                </td>
+                <td
+                  className={`text-right tabular-nums text-[13px] px-1.5 py-2 font-medium ${
+                    diff > 0
+                      ? 'text-[#3dd68c]'
+                      : diff < 0
+                        ? 'text-[#f07178]'
+                        : 'text-[#6b6f78]'
+                  }`}
+                >
+                  {diff > 0 ? `+${diff}` : diff}
+                </td>
+                <td className="text-right tabular-nums text-[13px] px-1.5 py-2 text-[#c4c7ce]">
+                  {p.kd.toFixed(2)}
+                </td>
+                {!isFaceit && (
+                  <td className="text-right tabular-nums text-[13px] px-1.5 py-2 text-[#c4c7ce]">
+                    {p.adr != null ? Math.round(p.adr) : '—'}
+                  </td>
+                )}
+                <td className="text-right tabular-nums text-[13px] px-1.5 py-2 text-[#c4c7ce]">
+                  {p.hs != null ? `${Math.round(p.hs)}` : '—'}
+                </td>
+                {!isFaceit && (
+                  <td
+                    className={`text-right tabular-nums text-[13px] px-1.5 pr-3 sm:pr-4 py-2 font-semibold ${
+                      p.rating == null
+                        ? 'text-[#6b6f78]'
+                        : p.rating >= 0
+                          ? 'text-[#3dd68c]'
+                          : 'text-[#f07178]'
+                    }`}
+                  >
+                    {p.rating != null
+                      ? `${p.rating >= 0 ? '+' : ''}${(p.rating * 100).toFixed(0)}`
+                      : '—'}
+                  </td>
+                )}
+                {isFaceit && (
+                  <td className="text-right tabular-nums text-[13px] px-1.5 py-2 text-[#c4c7ce]">
+                    {p.mvp ?? '—'}
+                  </td>
+                )}
+                {isFaceit && (
+                  <td className="text-right tabular-nums text-[11px] px-1.5 pr-3 sm:pr-4 py-2 text-[#6b6f78]">
+                    {p.multi ?? '—'}
+                  </td>
+                )}
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
       </div>
-    </div>
+    </section>
   );
+}
+
+/* ── data ─────────────────────────────────────────────────── */
+
+function fromFaceit(match: MatchStats): Team[] {
+  const t = match.teams;
+  if (!t?.team1 || !t?.team2) return [];
+
+  const build = (team: any, name: string, side: Team['side']): Team => {
+    const score = Number(team.score) || 0;
+    const players: Row[] = [...(team.players || [])]
+      .map((p: any, i: number) => {
+        const k = n(p.kills);
+        const d = n(p.deaths);
+        const a = n(p.assists);
+        return {
+          id: p.playerId || `f${i}`,
+          name: p.nickname || 'Unknown',
+          avatar: p.avatar,
+          steam64: undefined,
+          k,
+          d,
+          a,
+          kd: n(p.kd) || (d > 0 ? k / d : k),
+          adr: null,
+          hs: p.hsPercent != null ? n(p.hsPercent) : null,
+          mvp: p.mvps != null ? n(p.mvps) : null,
+          rating: null,
+          multi:
+            p.tripleKills != null
+              ? `${n(p.tripleKills)}/${n(p.quadroKills)}/${n(p.pentaKills)}`
+              : null,
+        };
+      })
+      .sort((a, b) => b.k - a.k || b.kd - a.kd);
+
+    const other =
+      team === t.team1 ? Number(t.team2.score) || 0 : Number(t.team1.score) || 0;
+    const won =
+      team.won != null ? !!team.won : score > other;
+
+    return {
+      name: cleanName(team.name, name),
+      score,
+      won: score === other ? false : won,
+      side,
+      players,
+    };
+  };
+
+  const a = build(t.team1, 'Team A', 'neutral');
+  const b = build(t.team2, 'Team B', 'neutral');
+  // mark sole winner
+  if (a.score !== b.score) {
+    a.won = a.score > b.score;
+    b.won = b.score > a.score;
+  }
+  return [a, b];
+}
+
+function fromLeetify(match: any): Team[] {
+  const stats: any[] = match.stats || [];
+  if (!stats.length) return [];
+
+  const nums = Array.from(
+    new Set(stats.map((p) => p.initial_team_number).filter((x) => x != null))
+  ).sort((a: any, b: any) => a - b) as number[];
+
+  const sides = nums.length >= 2 ? nums.slice(0, 2) : nums.length === 1 ? [nums[0]] : [2, 3];
+
+  return sides.map((teamNum, idx) => {
+    const rows = stats.filter((p) => p.initial_team_number === teamNum);
+    const score =
+      match.team_scores?.find((s: any) => s.team_number === teamNum)?.score ?? 0;
+    const other =
+      match.team_scores?.find((s: any) => s.team_number !== teamNum)?.score ?? 0;
+
+    const players: Row[] = rows
+      .map((p: any, i: number) => {
+        const k = n(p.total_kills ?? p.kills);
+        const d = n(p.total_deaths ?? p.deaths);
+        const a = n(p.total_assists ?? p.assists);
+        let hs: number | null = null;
+        if (p.accuracy_head != null) {
+          const h = n(p.accuracy_head);
+          hs = h <= 1 ? h * 100 : h;
+        } else if (p.total_hs_kills != null && k > 0) {
+          hs = (n(p.total_hs_kills) / k) * 100;
+        }
+        return {
+          id: p.steam64_id || `l${i}`,
+          name: p.steam_username || p.nickname || p.name || 'Unknown',
+          avatar: p.avatar,
+          steam64: p.steam64_id,
+          k,
+          d,
+          a,
+          kd: n(p.kd_ratio) || (d > 0 ? k / d : k),
+          adr:
+            p.dpr != null
+              ? n(p.dpr)
+              : p.damage_per_round != null
+                ? n(p.damage_per_round)
+                : null,
+          hs,
+          mvp: p.mvps != null ? n(p.mvps) : null,
+          rating: p.leetify_rating != null ? n(p.leetify_rating) : null,
+          multi: null,
+        };
+      })
+      .sort((a, b) => b.k - a.k || (b.adr ?? 0) - (a.adr ?? 0));
+
+    // Leetify often uses 2/3 for CT/T
+    const side: Team['side'] =
+      teamNum === 2 ? 'ct' : teamNum === 3 ? 't' : 'neutral';
+    const name =
+      side === 'ct' ? 'CT' : side === 't' ? 'T' : idx === 0 ? 'Team A' : 'Team B';
+
+    return {
+      name,
+      score: Number(score) || 0,
+      won: Number(score) > Number(other),
+      side,
+      players,
+    };
+  });
+}
+
+function cleanName(name: any, fallback: string) {
+  if (!name || typeof name !== 'string') return fallback;
+  if (name.length > 20 || /^[0-9a-f-]{16,}$/i.test(name)) return fallback;
+  return name;
+}
+
+function n(v: any): number {
+  const x = Number(v);
+  return Number.isFinite(x) ? x : 0;
+}
+
+function formatDuration(seconds: number) {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, '0')}`;
 }

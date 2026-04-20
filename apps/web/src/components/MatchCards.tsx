@@ -54,9 +54,9 @@ function outcomeStyles(outcome: Outcome) {
   }
   return {
     edge:
-      'bg-[linear-gradient(90deg,rgba(252,211,77,0.34)_0%,rgba(252,211,77,0.12)_40%,rgba(252,211,77,0.03)_75%,transparent_100%)]',
-    score: 'text-amber-200',
-    pill: 'bg-amber-500/20 text-amber-200 ring-1 ring-amber-400/30',
+      'bg-[linear-gradient(90deg,rgba(255,255,255,0.32)_0%,rgba(255,255,255,0.12)_40%,rgba(255,255,255,0.03)_75%,transparent_100%)]',
+    score: 'text-white',
+    pill: 'bg-white/15 text-white ring-1 ring-white/30',
     label: 'Draw',
   };
 }

@@ -147,7 +147,7 @@ export default function ProfilePage() {
                     isRefreshingMatches ? 'animate-pulse' : ''
                   }`}
                 />
-                <span className="hidden sm:inline w-[4.5rem] text-left">
+                <span className="hidden sm:inline w-[4.5rem] text-center">
                   {isRefreshingMatches ? 'Updating…' : 'Matches'}
                 </span>
               </button>
@@ -164,7 +164,7 @@ export default function ProfilePage() {
                     isRefreshing ? 'animate-spin' : ''
                   }`}
                 />
-                <span className="hidden sm:inline w-[5rem] text-left">
+                <span className="hidden sm:inline w-[5rem] text-center">
                   {isRefreshing ? 'Refreshing…' : 'Refresh'}
                 </span>
               </button>

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from 'next/image';
+import { HiExternalLink } from 'react-icons/hi';
 import type { UserProfile } from '@vantage/shared';
 import {
   getSteamLevelColor,
@@ -598,6 +599,7 @@ function ExtLink({
         className={`w-3.5 h-3.5 ${invertLogo ? 'brightness-0 invert' : ''}`}
       />
       {label}
+      <HiExternalLink className="w-3 h-3 opacity-50" aria-hidden />
     </a>
   );
 }

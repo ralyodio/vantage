@@ -8,12 +8,32 @@ const leetifyService = new LeetifyService();
 const steamService = new SteamService();
 const cacheService = new CacheService();
 
+/**
+ * Leetify v3 history returns data_source names like "matchmaking_wingman",
+ * but the v2 match endpoint serves those demos under the short forms.
+ * Verified: wingman matches resolve via "matchmaking".
+ */
+const DATA_SOURCE_ALIASES: Record<string, string> = {
+  matchmaking_wingman: 'matchmaking',
+  wingman: 'matchmaking',
+  matchmaking: 'matchmaking',
+  premier: 'premier',
+  faceit: 'faceit',
+  esea: 'esea',
+};
+
+function normalizeDataSource(source: string): string {
+  const key = source.trim().toLowerCase();
+  return DATA_SOURCE_ALIASES[key] || key;
+}
+
 export async function matchesRoutes(fastify: FastifyInstance) {
   // Get full match details by data source and ID
   fastify.get<{
     Params: { dataSource: string; dataSourceId: string };
   }>('/matches/:dataSource/:dataSourceId', async (request, reply) => {
-    const { dataSource, dataSourceId } = request.params;
+    const { dataSourceId } = request.params;
+    const dataSource = normalizeDataSource(request.params.dataSource);
     const cacheKey = `match:${dataSource}:${dataSourceId}`;
 
     // Extract API keys from headers

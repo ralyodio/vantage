@@ -110,6 +110,41 @@ export function getFaceitLevelIcon(level?: number | null): string | null {
   return `/logos/faceit-levels/${level}.svg`;
 }
 
+/** Official CS2 Premier rating tiers (k = floor(rating/5000), clamped to 6) */
+export const PREMIER_TIER_COLORS = [
+  '#9A9A9A', // 0–4,999     grey
+  '#5E98D9', // 5,000–9,999 light blue
+  '#4B69FF', // 10–14,999   blue
+  '#8847FF', // 15–19,999   purple
+  '#D32CE6', // 20–24,999   pink
+  '#EB4B4B', // 25–29,999   red
+  '#E4AE39', // 30,000+     gold
+] as const;
+
+export function getPremierTier(rating?: number | null): number | null {
+  if (rating == null || !Number.isFinite(Number(rating))) return null;
+  const r = Number(rating);
+  if (r <= 0) return null;
+  return Math.min(Math.floor(r / 5000), 6);
+}
+
+/** Tinted official premier banner for the tier; gray "none" banner when unrated */
+export function getPremierBadge(rating?: number | null): {
+  src: string;
+  tier: number | null;
+  color: string;
+} {
+  const tier = getPremierTier(rating);
+  if (tier == null) {
+    return { src: '/logos/premier/none.svg', tier: null, color: '#6b6f78' };
+  }
+  return {
+    src: `/logos/premier/tier-${tier}.svg`,
+    tier,
+    color: PREMIER_TIER_COLORS[tier],
+  };
+}
+
 export const LOGOS = {
   steam: '/logos/steam.svg',
   faceit: '/logos/faceit.svg',

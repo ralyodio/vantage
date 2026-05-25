@@ -12,6 +12,7 @@ import {
 import {
   LOGOS,
   getFaceitLevelIcon,
+  getPremierBadge,
   formatPct,
   formatNum,
 } from '../lib/map-assets';
@@ -269,15 +270,23 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
             <div className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
               {k.label}
             </div>
-            <div
-              className={`text-xl sm:text-2xl font-semibold tabular-nums tracking-tight ${
-                k.tone || 'text-white'
-              }`}
-            >
-              {k.value}
-            </div>
-            {k.hint && (
-              <div className="text-[11px] text-zinc-500 mt-0.5 truncate">{k.hint}</div>
+            {k.label === 'Premier' ? (
+              <PremierBadge rating={leetify?.ranks?.premier ?? null} />
+            ) : (
+              <>
+                <div
+                  className={`text-xl sm:text-2xl font-semibold tabular-nums tracking-tight ${
+                    k.tone || 'text-white'
+                  }`}
+                >
+                  {k.value}
+                </div>
+                {k.hint && (
+                  <div className="text-[11px] text-zinc-500 mt-0.5 truncate">
+                    {k.hint}
+                  </div>
+                )}
+              </>
             )}
           </div>
         ))}
@@ -429,6 +438,42 @@ function rel(v?: number) {
   if (v == null) return '—';
   const p = v * 100;
   return `${p >= 0 ? '+' : ''}${p.toFixed(1)}%`;
+}
+
+/** Official CS2 Premier banner — tinted per tier, number inside; gray + "—" when unrated */
+function PremierBadge({ rating }: { rating?: number | null }) {
+  const { src, tier, color } = getPremierBadge(rating);
+  const label =
+    tier == null
+      ? '—'
+      : Number(rating).toLocaleString('en-US');
+
+  return (
+    <div
+      className="relative h-8 w-[6.9rem] my-0.5 select-none"
+      title={
+        tier == null
+          ? 'Premier CS Rating — unrated'
+          : `Premier CS Rating ${label}`
+      }
+    >
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" className="absolute inset-0 h-full w-full" />
+      {/* number sits in the wide section, clear of the left pips */}
+      <span
+        className="absolute inset-y-0 right-2 flex items-center text-[13px] font-bold tabular-nums text-white [text-shadow:0_1px_2px_rgba(0,0,0,0.85)]"
+        style={tier == null ? { color: '#b9bcc2' } : undefined}
+      >
+        {label}
+      </span>
+      {/* tier accent underline */}
+      <span
+        className="absolute -bottom-0.5 right-2 h-0.5 w-6 rounded-full opacity-80"
+        style={{ backgroundColor: color }}
+        aria-hidden
+      />
+    </div>
+  );
 }
 
 /** Official Steam friendPlayerLevel circle (border colors / 100+ sprites) */

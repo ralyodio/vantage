@@ -241,7 +241,7 @@ export default function ProfilePage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease, delay: 0.12 }}
             >
-              <div className="sticky top-[4.5rem]">
+              <div className="sticky top-24">
                 <RiskMeter risk={profile.risk} />
               </div>
             </motion.div>

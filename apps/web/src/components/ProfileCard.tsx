@@ -443,68 +443,30 @@ function rel(v?: number) {
 }
 
 /**
- * Leetify/CS2-style CS Rating badge: two tier-colored vertical lines +
- * skewed dark plate with the rating (thousands part slightly larger).
- * Unrated → tier-0 grey plate with a dash.
+ * Official Valve premier banner, tinted with Leetify's tier palette
+ * (stripes follow the tier color). Rating number sits inside; unrated
+ * gets the grey banner with a dash.
  */
 function PremierBadge({ rating }: { rating?: number | null }) {
-  const tier = getPremierTier(rating) ?? 0;
-  const s = PREMIER_TIER_STYLES[tier];
-  const rated = rating != null && Number(rating) > 0;
-  const r = rated ? Math.floor(Number(rating)) : 0;
-  const large = rated ? `${Math.floor(r / 1000).toLocaleString('en-US')},` : '';
-  const small = rated ? String(r % 1000).padStart(3, '0') : '';
+  const tier = getPremierTier(rating);
+  const rated = tier != null;
+  const s = PREMIER_TIER_STYLES[tier ?? 0];
+  const src = rated ? `/logos/premier/tier-${tier}.svg` : '/logos/premier/none.svg';
+  const label = rated ? Number(rating).toLocaleString('en-US') : '—';
 
   return (
     <div
-      className="flex items-center select-none my-1"
-      style={{ fontSize: '1.75rem', height: '1em' }}
-      title={rated ? `Premier CS Rating ${r.toLocaleString('en-US')}` : 'Premier CS Rating — unrated'}
+      className="relative my-1 h-[2.1rem] w-[5.85rem] select-none"
+      title={rated ? `Premier CS Rating ${label}` : 'Premier CS Rating — unrated'}
     >
-      {/* vertical tier lines (official vector) */}
-      <svg
-        viewBox="0 0 17 32"
-        className="relative z-[1] shrink-0"
-        style={{ width: '0.53125em', height: '1em' }}
-        aria-hidden
+      {/* eslint-disable-next-line @next/next/no-img-element */}
+      <img src={src} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
+      <span
+        className="absolute inset-y-0 right-1.5 flex items-center text-[12px] font-bold tabular-nums tracking-tight"
+        style={{ color: rated ? s.text : '#9aa0a8' }}
       >
-        <path
-          fill={s.line}
-          d="M5.44 2.13A2.6 2.6 0 0 1 7.99 0h1.86a.6.6 0 0 1 .6.7L4.83 31.5a.6.6 0 0 1-.6.5h-2.3c-1 0-1.76-.9-1.58-1.89l5.1-27.98ZM11.82.99c.1-.57.6-.99 1.18-.99h2.93a.6.6 0 0 1 .59.7l-5.4 30.31c-.1.57-.6.99-1.18.99H7a.6.6 0 0 1-.59-.7L11.82.98Z"
-        />
-      </svg>
-
-      {/* skewed rating plate */}
-      <div
-        className="flex items-center justify-center"
-        style={{
-          marginLeft: '-0.25em',
-          minWidth: rated ? '2.21875em' : '1.4em',
-          height: '1em',
-          paddingInline: '0.25em 0.15em',
-          background: s.plate,
-          border: `${0.0625}em solid ${s.line}99`,
-          borderRadius: '0.09375em',
-          transform: 'skew(-10deg)',
-          color: s.text,
-          fontWeight: 700,
-          whiteSpace: 'nowrap',
-        }}
-      >
-        <div
-          className="flex items-baseline"
-          style={{ transform: 'skew(10deg)' }}
-        >
-          {rated ? (
-            <>
-              <span style={{ fontSize: '0.5417em', lineHeight: 1 }}>{large}</span>
-              <span style={{ fontSize: '0.4583em', lineHeight: 1 }}>{small}</span>
-            </>
-          ) : (
-            <span style={{ fontSize: '0.5em', lineHeight: 1 }}>—</span>
-          )}
-        </div>
-      </div>
+        {label}
+      </span>
     </div>
   );
 }

@@ -127,7 +127,8 @@ export const PREMIER_TIER_STYLES: {
   plate: string;
   text: string;
 }[] = [
-  { line: '#b1c4d9', plate: '#2c2f37', text: '#eef2f7' }, // tier 0
+  // tier 0 / unrated — grey theme matching the dark plate (no white stripes)
+  { line: '#8a8f98', plate: '#2c2f37', text: '#c9cdd4' }, // tier 0
   { line: '#5e98d9', plate: '#061c36', text: '#8bc1ff' }, // tier 1
   { line: '#4c6aff', plate: '#060e37', text: '#8a9dfe' }, // tier 2
   { line: '#8847ff', plate: '#180638', text: '#b48bff' }, // tier 3

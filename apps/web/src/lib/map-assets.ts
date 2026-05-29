@@ -121,28 +121,26 @@ export const PREMIER_TIER_COLORS = [
   '#E4AE39', // 30,000+     gold
 ] as const;
 
+/** Leetify-style cs-rating badge palette per tier (line / plate / text) */
+export const PREMIER_TIER_STYLES: {
+  line: string;
+  plate: string;
+  text: string;
+}[] = [
+  { line: '#b1c4d9', plate: '#2c2f37', text: '#eef2f7' }, // tier 0
+  { line: '#5e98d9', plate: '#061c36', text: '#8bc1ff' }, // tier 1
+  { line: '#4c6aff', plate: '#060e37', text: '#8a9dfe' }, // tier 2
+  { line: '#8847ff', plate: '#180638', text: '#b48bff' }, // tier 3
+  { line: '#d32ce6', plate: '#320638', text: '#f177ff' }, // tier 4
+  { line: '#eb4b4b', plate: '#380606', text: '#ff8686' }, // tier 5
+  { line: '#ffd700', plate: '#383006', text: '#ffdf35' }, // tier 6
+];
+
 export function getPremierTier(rating?: number | null): number | null {
   if (rating == null || !Number.isFinite(Number(rating))) return null;
   const r = Number(rating);
   if (r <= 0) return null;
   return Math.min(Math.floor(r / 5000), 6);
-}
-
-/** Tinted official premier banner for the tier; gray "none" banner when unrated */
-export function getPremierBadge(rating?: number | null): {
-  src: string;
-  tier: number | null;
-  color: string;
-} {
-  const tier = getPremierTier(rating);
-  if (tier == null) {
-    return { src: '/logos/premier/none.svg', tier: null, color: '#6b6f78' };
-  }
-  return {
-    src: `/logos/premier/tier-${tier}.svg`,
-    tier,
-    color: PREMIER_TIER_COLORS[tier],
-  };
 }
 
 export const LOGOS = {

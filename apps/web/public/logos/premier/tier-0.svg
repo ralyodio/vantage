@@ -3,10 +3,9 @@
 <path d="M25 0H21L9 64H13L25 0Z" fill="#25282F"/>
 <path d="M178 0H33.9996L22 64H166L178 0Z" fill="url(#paint0_linear_632_1563)"/>
 <path d="M176.25 1.5H33.24L21.6562 62.5H164.666L176.25 1.5Z" fill="url(#paint1_linear_632_1563)"/>
-<path d="M46.1141 4L54 4L40.8859 61H33L46.1141 4Z" fill="#7D828C" opacity="0.21"/>
-<path d="M36.7301 4L42 4L30.2699 61H25L36.7301 4Z" fill="#7D828C" opacity="0.30"/>
-<path d="M56.8737 4L72 4L59.1263 61H44L56.8737 4Z" fill="#7D828C" opacity="0.13"/>
-<path d="M75.7813 4L110 4L97.2187 61H63L75.7813 4Z" fill="#7D828C" opacity="0.06"/>
+<path d="M38 4 L44 4 L31.5 61 L25.5 61 Z" fill="#7D828C" opacity="0.30"/>
+<path d="M47 4 L60 4 L47.5 61 L34.5 61 Z" fill="#7D828C" opacity="0.18"/>
+<path d="M63 4 L97 4 L84.5 61 L50.5 61 Z" fill="#7D828C" opacity="0.07"/>
 <path d="M18 0H27L18 64H3.25L18 0Z" fill="#1A1C21"/>
 <path d="M12 0H21L9 64H0L12 0Z" fill="#9A9A9A"/>
 <path d="M24.9997 0H33.9997L22 64H13L24.9997 0Z" fill="#9A9A9A"/>

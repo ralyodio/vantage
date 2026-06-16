@@ -271,7 +271,7 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
               {k.label}
             </div>
             {k.label === 'Premier' ? (
-              <div className="flex flex-1 items-center">
+              <div className="flex flex-1 items-center justify-center">
                 <PremierBadge rating={leetify?.ranks?.premier ?? null} />
               </div>
             ) : (
@@ -456,7 +456,7 @@ function PremierBadge({ rating }: { rating?: number | null }) {
 
   return (
     <div
-      className="relative my-1 h-[2.1rem] w-[5.85rem] select-none"
+      className="relative h-[2.1rem] w-[5.85rem] select-none"
       title={rated ? `Premier CS Rating ${label}` : 'Premier CS Rating — unrated'}
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}

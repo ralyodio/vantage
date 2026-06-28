@@ -452,21 +452,28 @@ function PremierBadge({ rating }: { rating?: number | null }) {
   const rated = tier != null;
   const s = PREMIER_TIER_STYLES[tier ?? 0];
   const src = rated ? `/logos/premier/tier-${tier}.svg` : '/logos/premier/none.svg';
-  const label = rated ? Number(rating).toLocaleString('en-US') : '—';
+  // unrated dash is baked into none.svg — only overlay the real number
+  const label = rated ? Number(rating).toLocaleString('en-US') : null;
 
   return (
     <div
       className="relative h-[2.1rem] w-[5.85rem] select-none"
-      title={rated ? `Premier CS Rating ${label}` : 'Premier CS Rating — unrated'}
+      title={
+        rated && label
+          ? `Premier CS Rating ${label}`
+          : 'Premier CS Rating — unrated'
+      }
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img src={src} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
-      <span
-        className="absolute inset-y-0 right-1.5 flex items-center text-[12px] font-bold tabular-nums tracking-tight"
-        style={{ color: rated ? s.text : '#9aa0a8' }}
-      >
-        {label}
-      </span>
+      {label && (
+        <span
+          className="absolute inset-y-0 right-1.5 flex items-center text-[12px] font-bold tabular-nums tracking-tight"
+          style={{ color: s.text }}
+        >
+          {label}
+        </span>
+      )}
     </div>
   );
 }

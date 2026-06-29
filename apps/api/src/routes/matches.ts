@@ -9,14 +9,12 @@ const steamService = new SteamService();
 const cacheService = new CacheService();
 
 /**
- * Leetify v3 history returns data_source names like "matchmaking_wingman",
- * but the v2 match endpoint serves those demos under the short forms.
- * Verified: wingman matches resolve via "matchmaking".
+ * Leetify v3 history returns data_source names like "matchmaking_wingman"
+ * or "matchmaking_competitive", but the v2 match endpoint serves all
+ * Valve demo types under "matchmaking". Verified live for premier,
+ * wingman, and competitive.
  */
 const DATA_SOURCE_ALIASES: Record<string, string> = {
-  matchmaking_wingman: 'matchmaking',
-  wingman: 'matchmaking',
-  matchmaking: 'matchmaking',
   premier: 'premier',
   faceit: 'faceit',
   esea: 'esea',
@@ -24,7 +22,12 @@ const DATA_SOURCE_ALIASES: Record<string, string> = {
 
 function normalizeDataSource(source: string): string {
   const key = source.trim().toLowerCase();
-  return DATA_SOURCE_ALIASES[key] || key;
+  if (DATA_SOURCE_ALIASES[key]) return DATA_SOURCE_ALIASES[key];
+  // every matchmaking_* variant (and "matchmaking" itself) resolves to "matchmaking"
+  if (key === 'matchmaking' || key.startsWith('matchmaking_')) {
+    return 'matchmaking';
+  }
+  return key;
 }
 
 export async function matchesRoutes(fastify: FastifyInstance) {

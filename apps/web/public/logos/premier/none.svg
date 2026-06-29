@@ -12,7 +12,9 @@
 <path d="M12 0H20L8 64H0L12 0Z" fill="url(#paint4_linear_632_1600)"/>
 <path d="M12 0H20L8 64H0L12 0Z" fill="url(#paint5_linear_632_1600)"/>
 
-<rect x="91" y="29.75" width="16" height="4.5" rx="2.25" fill="#9aa0a8"/>
+<rect x="75.5" y="29.75" width="11" height="4.5" rx="2.25" fill="#9aa0a8"/>
+<rect x="93.5" y="29.75" width="11" height="4.5" rx="2.25" fill="#9aa0a8"/>
+<rect x="111.5" y="29.75" width="11" height="4.5" rx="2.25" fill="#9aa0a8"/>
 </g>
 <defs>
 <linearGradient id="paint0_linear_632_1600" x1="187.49" y1="48.7288" x2="30.4973" y2="20.5012" gradientUnits="userSpaceOnUse">

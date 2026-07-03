@@ -16,6 +16,7 @@ import {
   PREMIER_TIER_STYLES,
   formatPct,
   formatNum,
+  countryFlag,
 } from '../lib/map-assets';
 
 export default function ProfileCard({ profile }: { profile: UserProfile }) {
@@ -186,9 +187,13 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
                 <span className="text-zinc-200">{steam.realName}</span>
               )}
               {steam.country && (
-                <span>
-                  {steam.country}
-                  {steam.state ? ` · ${steam.state}` : ''}
+                <span className="inline-flex items-center gap-1">
+                  <span className="text-base leading-none" title={steam.country}>
+                    {countryFlag(steam.country) ?? steam.country}
+                  </span>
+                  {steam.state ? (
+                    <span className="text-zinc-400">{steam.state}</span>
+                  ) : null}
                 </span>
               )}
               <span>{steam.yearsOfService ?? 0} years on Steam</span>
@@ -468,7 +473,7 @@ function PremierBadge({ rating }: { rating?: number | null }) {
       <img src={src} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
       {label && (
         <span
-          className="absolute inset-y-0 right-1.5 flex items-center text-[12px] font-bold tabular-nums tracking-tight"
+          className="absolute inset-y-0 left-[55%] right-[4%] flex items-center justify-center text-[14px] font-bold tabular-nums tracking-tight"
           style={{ color: s.text }}
         >
           {label}

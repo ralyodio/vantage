@@ -166,3 +166,14 @@ export function formatNum(val?: number | null, digits = 2): string {
   if (val == null || Number.isNaN(val)) return '—';
   return val.toFixed(digits);
 }
+
+/** ISO 3166-1 alpha-2 code → emoji flag (🇷🇴, 🇨🇦, …); null when not a valid code */
+export function countryFlag(code?: string | null): string | null {
+  if (!code || !/^[A-Za-z]{2}$/.test(code)) return null;
+  const cc = code.toUpperCase();
+  // regional indicator symbols
+  const flag = String.fromCodePoint(
+    ...[...cc].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)
+  );
+  return flag;
+}

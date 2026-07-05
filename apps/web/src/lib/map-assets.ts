@@ -172,8 +172,7 @@ export function countryFlag(code?: string | null): string | null {
   if (!code || !/^[A-Za-z]{2}$/.test(code)) return null;
   const cc = code.toUpperCase();
   // regional indicator symbols
-  const flag = String.fromCodePoint(
-    ...[...cc].map((c) => 0x1f1e6 + c.charCodeAt(0) - 65)
-  );
-  return flag;
+  const cp1 = 0x1f1e6 + cc.charCodeAt(0) - 65;
+  const cp2 = 0x1f1e6 + cc.charCodeAt(1) - 65;
+  return String.fromCodePoint(cp1, cp2);
 }

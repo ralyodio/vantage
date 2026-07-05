@@ -194,7 +194,7 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
                       src={getCountryFlag(steam.country)!}
                       alt={steam.country}
                       title={steam.country}
-                      className="h-[1.05em] w-auto rounded-[2px] object-contain ring-1 ring-white/15"
+                      className="h-[0.9em] w-auto object-contain"
                     />
                   ) : (
                     <span>{steam.country}</span>

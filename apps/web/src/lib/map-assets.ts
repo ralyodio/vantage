@@ -167,12 +167,11 @@ export function formatNum(val?: number | null, digits = 2): string {
   return val.toFixed(digits);
 }
 
-/** ISO 3166-1 alpha-2 code → emoji flag (🇷🇴, 🇨🇦, …); null when not a valid code */
-export function countryFlag(code?: string | null): string | null {
+/**
+ * ISO 3166-1 alpha-2 code → local flag PNG path (flagcdn w160, saved
+ * under public/flags). Null when the code isn't a valid pair.
+ */
+export function getCountryFlag(code?: string | null): string | null {
   if (!code || !/^[A-Za-z]{2}$/.test(code)) return null;
-  const cc = code.toUpperCase();
-  // regional indicator symbols
-  const cp1 = 0x1f1e6 + cc.charCodeAt(0) - 65;
-  const cp2 = 0x1f1e6 + cc.charCodeAt(1) - 65;
-  return String.fromCodePoint(cp1, cp2);
+  return `/flags/${code.toLowerCase()}.png`;
 }

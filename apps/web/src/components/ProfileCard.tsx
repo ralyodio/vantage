@@ -16,7 +16,7 @@ import {
   PREMIER_TIER_STYLES,
   formatPct,
   formatNum,
-  countryFlag,
+  getCountryFlag,
 } from '../lib/map-assets';
 
 export default function ProfileCard({ profile }: { profile: UserProfile }) {
@@ -187,10 +187,18 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
                 <span className="text-zinc-200">{steam.realName}</span>
               )}
               {steam.country && (
-                <span className="inline-flex items-center gap-1">
-                  <span className="text-base leading-none" title={steam.country}>
-                    {countryFlag(steam.country) ?? steam.country}
-                  </span>
+                <span className="inline-flex items-center gap-1.5">
+                  {getCountryFlag(steam.country) ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={getCountryFlag(steam.country)!}
+                      alt={steam.country}
+                      title={steam.country}
+                      className="h-[1.05em] w-auto rounded-[2px] object-contain ring-1 ring-white/15"
+                    />
+                  ) : (
+                    <span>{steam.country}</span>
+                  )}
                   {steam.state ? (
                     <span className="text-zinc-400">{steam.state}</span>
                   ) : null}
@@ -473,8 +481,8 @@ function PremierBadge({ rating }: { rating?: number | null }) {
       <img src={src} alt="" className="absolute inset-0 h-full w-full" draggable={false} />
       {label && (
         <span
-          className="absolute inset-y-0 left-[55%] right-[4%] flex items-center justify-center text-[14px] font-bold tabular-nums tracking-tight"
-          style={{ color: s.text }}
+          className="absolute inset-y-0 flex items-center text-[19px] font-bold leading-none tabular-nums tracking-tight"
+          style={{ color: s.text, left: '55.5%', transform: 'translateX(-50%)' }}
         >
           {label}
         </span>

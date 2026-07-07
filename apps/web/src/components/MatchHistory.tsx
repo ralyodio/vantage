@@ -265,6 +265,10 @@ export default function MatchHistory({
                 ) : (
                   <FaceitMatchCard
                     match={item.data}
+                    expanded={expandedId === item.id}
+                    onToggle={() =>
+                      setExpandedId(expandedId === item.id ? null : item.id)
+                    }
                     onViewScoreboard={() =>
                       fetchFullMatchDetails(item.data, 'faceit')
                     }

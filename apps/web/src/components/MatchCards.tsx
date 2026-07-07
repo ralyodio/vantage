@@ -212,6 +212,14 @@ function resolveScores(match: any, player: any): {
 
   if (typeof match.score === 'string' && match.score.includes('-')) {
     const [a, b] = match.score.split('-').map((x: string) => Number(x.trim()) || 0);
+    // FACEIT scores are faction1-faction2 — order by reported result
+    const result = match.result ?? match.outcome;
+    if (result === 'win') {
+      return { myScore: Math.max(a, b), enemyScore: Math.min(a, b), outcome: 'win' };
+    }
+    if (result === 'loss') {
+      return { myScore: Math.min(a, b), enemyScore: Math.max(a, b), outcome: 'loss' };
+    }
     return { myScore: a, enemyScore: b, outcome: a === b ? 'tie' : a > b ? 'win' : 'loss' };
   }
 
@@ -496,14 +504,25 @@ export function LeetifyMatchCard({
   );
 }
 
-export function FaceitMatchCard({ match, onViewScoreboard }: any) {
-  const isWin = match.result === 'win';
-  const outcome: Outcome = isWin ? 'win' : 'loss';
+export function FaceitMatchCard({
+  match,
+  expanded,
+  onToggle,
+  onViewScoreboard,
+}: any) {
+  const { myScore, enemyScore, outcome } = resolveScores(match, null);
   const styles = outcomeStyles(outcome);
   const mapLabel = getMapDisplayName(match.map);
   const banner = getMapBanner(match.map);
   const icon = getMapIcon(match.map);
   const elo = match.eloChange;
+  const kda = `${match.kills ?? 0}/${match.deaths ?? 0}/${match.assists ?? 0}`;
+  const kd = Number(match.kd ?? 0).toFixed(2);
+  const hasDetails =
+    match.hsPercent != null ||
+    match.kr != null ||
+    match.mvps != null ||
+    match.tripleKills != null;
 
   return (
     <article className="group relative overflow-hidden rounded-xl border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.35)] ring-1 ring-black/40">
@@ -516,7 +535,22 @@ export function FaceitMatchCard({ match, onViewScoreboard }: any) {
         aria-hidden
       />
 
-      <div className="relative z-10 flex min-h-[5.25rem] items-center gap-3 px-3 py-3 pl-4 sm:gap-4 sm:px-4 sm:py-3.5 sm:pl-5">
+      <div
+        role="button"
+        tabIndex={0}
+        onClick={() => {
+          if (hasDetails) onToggle();
+          else onViewScoreboard();
+        }}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            if (hasDetails) onToggle();
+            else onViewScoreboard();
+          }
+        }}
+        className="relative z-10 flex min-h-[5.25rem] cursor-pointer items-center gap-3 px-3 py-3 pl-4 outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-white/30 sm:gap-4 sm:px-4 sm:py-3.5 sm:pl-5"
+      >
         <MapIconBadge icon={icon} />
 
         <div className="min-w-0 flex-1">
@@ -543,20 +577,14 @@ export function FaceitMatchCard({ match, onViewScoreboard }: any) {
           <div
             className={`text-xl font-bold tabular-nums tracking-tight drop-shadow sm:text-2xl ${styles.score}`}
           >
-            {match.score}
+            {myScore}
+            <span className="mx-0.5 font-medium text-white/35">:</span>
+            <span className="font-semibold text-white/80">{enemyScore}</span>
           </div>
 
           <div className="hidden items-center gap-1.5 sm:flex">
-            <StatChip
-              label="K-D-A"
-              value={`${match.kills}/${match.deaths}/${match.assists ?? 0}`}
-              tone="text-white"
-            />
-            <StatChip
-              label="K/D"
-              value={Number(match.kd).toFixed(2)}
-              tone="text-white"
-            />
+            <StatChip label="K/D" value={kd} tone="text-white" />
+            <StatChip label="K-D-A" value={kda} tone="text-white" />
             {elo != null && (
               <StatChip
                 label="ELO"
@@ -566,27 +594,39 @@ export function FaceitMatchCard({ match, onViewScoreboard }: any) {
             )}
           </div>
 
-          <button
-            type="button"
-            onClick={onViewScoreboard}
-            className="rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm transition hover:bg-white/20"
-          >
-            Scoreboard
-          </button>
+          <div className="flex items-center gap-1.5">
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation();
+                onViewScoreboard();
+              }}
+              className="hidden rounded-lg bg-white/10 px-2.5 py-1.5 text-[11px] font-semibold text-white ring-1 ring-white/20 backdrop-blur-sm transition hover:bg-white/20 sm:inline-flex"
+            >
+              Scoreboard
+            </button>
+            {hasDetails && (
+              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-black/40 text-sm font-medium text-white/80 ring-1 ring-white/15">
+                <motion.span
+                  animate={{ rotate: expanded ? 45 : 0 }}
+                  transition={iconTransition}
+                  className="inline-flex leading-none will-change-transform"
+                >
+                  +
+                </motion.span>
+              </span>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="relative z-10 flex flex-wrap gap-1.5 border-t border-white/10 bg-black/35 px-3 py-2 sm:hidden">
-        <StatChip
-          label="K-D-A"
-          value={`${match.kills}/${match.deaths}/${match.assists ?? 0}`}
-          tone="text-white"
-        />
-        <StatChip
-          label="K/D"
-          value={Number(match.kd).toFixed(2)}
-          tone="text-white"
-        />
+      {/* Mobile secondary stats */}
+      <div className="relative z-10 flex gap-1.5 border-t border-white/10 bg-black/35 px-3 py-2 sm:hidden">
+        <StatChip label="K/D" value={kd} tone="text-white" />
+        <StatChip label="K-D-A" value={kda} tone="text-white" />
+        {match.hsPercent != null && (
+          <StatChip label="HS%" value={`${match.hsPercent}%`} tone="text-white" />
+        )}
         {elo != null && (
           <StatChip
             label="ELO"
@@ -594,10 +634,77 @@ export function FaceitMatchCard({ match, onViewScoreboard }: any) {
             tone={elo > 0 ? 'text-emerald-300' : 'text-rose-300'}
           />
         )}
-        {match.hsPercent != null && (
-          <StatChip label="HS%" value={`${match.hsPercent}%`} tone="text-white" />
-        )}
       </div>
+
+      <AnimatePresence initial={false}>
+        {expanded && hasDetails && (
+          <motion.div
+            key="expand"
+            initial={{ height: 0, opacity: 0 }}
+            animate={{ height: 'auto', opacity: 1 }}
+            exit={{ height: 0, opacity: 0 }}
+            transition={heightTransition}
+            className="relative z-10 overflow-hidden will-change-[height,opacity]"
+          >
+            <div className="border-t border-white/10 bg-black/55 px-3 py-3 backdrop-blur-md sm:px-4">
+              <motion.div
+                initial={{ y: -10, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: -6, opacity: 0 }}
+                transition={contentTransition}
+              >
+                <div className="grid grid-cols-2 gap-3 text-xs sm:grid-cols-4">
+                  <Col
+                    title="Combat"
+                    rows={[
+                      ['K', match.kills],
+                      ['D', match.deaths],
+                      ['A', match.assists ?? 0],
+                      ['MVP', match.mvps],
+                    ]}
+                  />
+                  <Col
+                    title="Aim"
+                    rows={[
+                      ['HS%', match.hsPercent != null ? `${match.hsPercent}%` : '—'],
+                      ['K/R', match.kr != null ? Number(match.kr).toFixed(2) : '—'],
+                    ]}
+                  />
+                  <Col
+                    title="Multi-kills"
+                    rows={[
+                      ['3K', match.tripleKills ?? '—'],
+                      ['4K', match.quadroKills ?? '—'],
+                      ['5K', match.pentaKills ?? '—'],
+                    ]}
+                  />
+                  {match.matchUrl && (
+                    <div className="flex items-end">
+                      <a
+                        href={match.matchUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="rounded-lg bg-black/40 px-3 py-1.5 text-[11px] font-semibold text-zinc-100 ring-1 ring-white/15 hover:bg-black/55"
+                      >
+                        Open on FACEIT
+                      </a>
+                    </div>
+                  )}
+                </div>
+                <div className="mt-3 sm:hidden">
+                  <button
+                    type="button"
+                    onClick={onViewScoreboard}
+                    className="rounded-lg bg-white/12 px-3 py-1.5 text-[11px] font-semibold text-white ring-1 ring-white/20 hover:bg-white/20"
+                  >
+                    Open scoreboard
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </article>
   );
 }

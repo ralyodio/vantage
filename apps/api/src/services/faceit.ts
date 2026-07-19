@@ -76,9 +76,23 @@ export class FaceitService {
           
           // Process each match for detailed stats
           for (const match of historyRes.data.items) {
-            const isWin = match.results?.winner === match.playing_faction;
+            // History items omit playing_faction — find our faction from the
+            // roster and compare against results.winner (authoritative).
+            let myFaction: string | null = match.playing_faction ?? null;
+            if (!myFaction && match.teams) {
+              for (const [factionKey, team] of Object.entries<any>(match.teams)) {
+                if (
+                  Array.isArray(team?.players) &&
+                  team.players.some((p: any) => p.player_id === playerId)
+                ) {
+                  myFaction = factionKey;
+                  break;
+                }
+              }
+            }
+            const isWin = myFaction != null && match.results?.winner === myFaction;
             if (isWin) recentWins++;
-            
+
             // Get detailed match stats
             try {
               const matchStatsRes = await axios.get(`${FACEIT_API_BASE}/matches/${match.match_id}/stats`, {
@@ -170,12 +184,21 @@ export class FaceitService {
                 const assists = parseInt(stats.Assists || stats.assists || '0');
                 const hs = parseInt(stats.Headshots || stats.headshots || '0');
                 const hsPercent = parseInt(stats['Headshots %'] || stats['headshots_%'] || '0');
-                
+
+                // Result already determined above via faction scan; the
+                // player's own Result stat is only a safety fallback.
+                const resultStat = parseInt(stats.Result || stats.result || '');
+                const determinedWin = Number.isFinite(resultStat)
+                  ? resultStat === 1
+                  : isWin;
+
                 matchHistory.push({
                   matchId: match.match_id,
                   date: new Date(match.finished_at * 1000),
                   map: mapName,
-                  result: isWin ? 'win' : 'loss',
+                  result: (myFaction != null ? isWin : determinedWin)
+                    ? 'win'
+                    : 'loss',
                   score: `${match.results?.score?.faction1 || 0}-${match.results?.score?.faction2 || 0}`,
                   kills,
                   deaths,
@@ -189,8 +212,7 @@ export class FaceitService {
                   quadroKills: parseInt(stats['Quadro Kills'] || stats.quadro_kills || '0'),
                   pentaKills: parseInt(stats['Penta Kills'] || stats.penta_kills || '0'),
                   gameMode: match.game_mode,
-                  faceitElo: match.elo,
-                  eloChange: match.elo_change,
+                  faceitElo: match.elo ?? null,
                   teams: teams.team1 && teams.team2 ? teams : undefined,
                   rounds: matchStatsRes.data.rounds?.length || 0,
                   matchUrl: `https://www.faceit.com/en/cs2/room/${match.match_id}`,
@@ -203,6 +225,15 @@ export class FaceitService {
         }
       } catch (historyError) {
         console.warn('Could not fetch match history:', historyError);
+      }
+
+      // Derive per-match ELO deltas: history items are newest-first and each
+      // carries the elo AFTER that match, so delta[i] = elo[i] - elo[i+1].
+      for (let i = 0; i < matchHistory.length; i++) {
+        const cur = matchHistory[i].faceitElo;
+        const prev = matchHistory[i + 1]?.faceitElo;
+        matchHistory[i].eloChange =
+          cur != null && prev != null ? cur - prev : undefined;
       }
       
       // 4. Get player bans

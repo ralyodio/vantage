@@ -97,7 +97,17 @@ export default function Home() {
     setPendingQuery('');
   };
 
-  const examples = ['aebu', 'mango', '76561198192472755'];
+  // every accepted query format, all resolving to the same (aebu) profile
+  const examples: { label: string; query: string; kind: string }[] = [
+    { label: 'aebu', query: 'aebu', kind: 'vanity' },
+    {
+      label: 'steamcommunity.com/id/aebu',
+      query: 'https://steamcommunity.com/id/aebu/',
+      kind: 'profile url',
+    },
+    { label: '76561199548276875', query: '76561199548276875', kind: 'steam64' },
+    { label: 'STEAM_0:1:79400573', query: 'STEAM_0:1:79400573', kind: 'steam32' },
+  ];
 
   const stats = [
     {
@@ -198,30 +208,67 @@ export default function Home() {
         </motion.div>
 
         <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-3 pb-16 pt-14 sm:px-4 sm:pt-20">
-          {/* Hero */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease }}
-            className="text-center"
-          >
-            <div className="mb-4 text-[11px] font-medium uppercase tracking-[0.22em] text-zinc-500">
-              CS2 Intelligence Platform
-            </div>
-            <h1 className="text-5xl font-bold tracking-tight text-white sm:text-6xl md:text-7xl">
-              VANTAGE<span className="text-emerald-400">.</span>
+          {/* Hero — masked line reveal */}
+          <div className="text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.35, ease }}
+              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-3 py-1.5"
+            >
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              </span>
+              <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-400">
+                CS2 Intelligence Platform
+              </span>
+            </motion.div>
+
+            <h1 className="font-bold uppercase leading-[0.95] tracking-tight">
+              <span className="block overflow-hidden pb-1">
+                <motion.span
+                  initial={{ y: '110%' }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.55, ease, delay: 0.08 }}
+                  className="block text-5xl text-white sm:text-6xl md:text-7xl"
+                >
+                  See what
+                </motion.span>
+              </span>
+              <span className="block overflow-hidden pb-2">
+                <motion.span
+                  initial={{ y: '110%' }}
+                  animate={{ y: 0 }}
+                  transition={{ duration: 0.55, ease, delay: 0.18 }}
+                  className="block text-5xl sm:text-6xl md:text-7xl"
+                >
+                  <span className="text-white">they&apos;re </span>
+                  <span className="text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,0.6)]">
+                    hiding
+                  </span>
+                  <span className="text-emerald-400">.</span>
+                </motion.span>
+              </span>
             </h1>
-            <p className="mt-3 text-lg italic text-zinc-400 sm:text-xl">
-              See what they&apos;re hiding.
-            </p>
-          </motion.div>
+
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, ease, delay: 0.34 }}
+              className="mt-5 max-w-md text-sm leading-relaxed text-zinc-400 sm:text-base"
+            >
+              Steam, FACEIT and Leetify intel — threat scores, premier ranks
+              and full match forensics for any CS2 player.
+            </motion.p>
+          </div>
 
           {/* Search */}
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease, delay: 0.08 }}
-            className="mt-8 w-full max-w-2xl"
+            transition={{ duration: 0.4, ease, delay: 0.3 }}
+            className="mt-9 w-full max-w-2xl"
           >
             <SearchBar onSearch={handleSearch} isLoading={isSearching} />
 
@@ -231,13 +278,17 @@ export default function Home() {
               </span>
               {examples.map((ex) => (
                 <button
-                  key={ex}
+                  key={ex.kind}
                   type="button"
-                  onClick={() => handleSearch(ex)}
+                  onClick={() => handleSearch(ex.query)}
                   disabled={isSearching}
-                  className="rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-400 transition-colors duration-200 hover:border-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+                  title={`${ex.kind} — ${ex.query}`}
+                  className="group/chip inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-400 transition-colors duration-200 hover:border-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-40"
                 >
-                  {ex}
+                  {ex.label}
+                  <span className="rounded bg-black/40 px-1 py-px text-[9px] font-medium uppercase tracking-wide text-zinc-500 opacity-70 transition-opacity duration-200 group-hover/chip:opacity-100">
+                    {ex.kind}
+                  </span>
                 </button>
               ))}
             </div>
@@ -247,7 +298,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease, delay: 0.16 }}
+            transition={{ duration: 0.4, ease, delay: 0.42 }}
             className="mt-12 w-full max-w-3xl overflow-hidden rounded-xl border border-white/[0.08] bg-[#111113]"
           >
             <div className="grid grid-cols-2 gap-px bg-white/[0.05] sm:grid-cols-4">
@@ -279,7 +330,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease, delay: 0.24 }}
+            transition={{ duration: 0.45, ease, delay: 0.52 }}
             className="mt-12 grid w-full grid-cols-1 gap-3 sm:grid-cols-3"
           >
             {features.map((f) => (
@@ -330,7 +381,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.45, ease, delay: 0.32 }}
+            transition={{ duration: 0.45, ease, delay: 0.62 }}
             className="mt-12 w-full max-w-3xl"
           >
             <div className="flex items-center gap-3">

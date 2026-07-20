@@ -4,7 +4,7 @@ import Head from 'next/head';
 import axios from 'axios';
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { HiArrowLeft, HiRefresh, HiOutlineCollection, HiX } from 'react-icons/hi';
+import { HiSearch, HiRefresh, HiOutlineCollection, HiX } from 'react-icons/hi';
 
 import ProfileCard from '../../components/ProfileCard';
 import RiskMeter from '../../components/RiskMeter';
@@ -25,6 +25,7 @@ export default function ProfilePage() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [isRefreshingMatches, setIsRefreshingMatches] = useState(false);
   const [refreshError, setRefreshError] = useState<string | null>(null);
+  const [navQuery, setNavQuery] = useState('');
 
   const { data, isLoading, error, refetch } = useQuery({
     queryKey: ['profile', id],
@@ -81,6 +82,14 @@ export default function ProfilePage() {
     }
   };
 
+  const handleNavSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const q = navQuery.trim();
+    if (!q) return;
+    setNavQuery('');
+    router.push(`/profile/${encodeURIComponent(q)}`);
+  };
+
   if (showCaptcha) {
     return (
       <CaptchaModal
@@ -114,25 +123,34 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-[#0a0a0b] text-zinc-100 antialiased">
         {/* Floating island navbar — full content width */}
         <div className="sticky top-0 z-40 pointer-events-none px-3 sm:px-4 pt-3 sm:pt-4">
-          <header className="pointer-events-auto mx-auto max-w-6xl flex items-center justify-between gap-3 h-12 sm:h-14 rounded-2xl border border-white/[0.08] bg-[#111113]/92 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.5)] px-2 sm:px-3">
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
-              <button
-                type="button"
-                onClick={() => router.push('/')}
-                aria-label="Back to search"
-                className="inline-flex items-center justify-center shrink-0 h-9 w-9 rounded-xl border border-white/[0.08] bg-white/[0.03] text-zinc-400 hover:text-white hover:bg-white/[0.06] hover:border-white/15 transition-all duration-200"
-              >
-                <HiArrowLeft className="w-4 h-4" />
-              </button>
+          <header className="pointer-events-auto mx-auto max-w-6xl flex items-center gap-2 sm:gap-3 h-12 sm:h-14 rounded-2xl border border-white/[0.08] bg-[#111113]/92 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.5)] px-2 sm:px-3">
+            <button
+              type="button"
+              onClick={() => router.push('/')}
+              className="hidden sm:inline text-[11px] font-semibold tracking-[0.16em] uppercase text-zinc-400 hover:text-white px-1 transition-colors duration-200 shrink-0"
+            >
+              Vantage
+            </button>
 
-              <button
-                type="button"
-                onClick={() => router.push('/')}
-                className="hidden sm:inline text-[11px] font-semibold tracking-[0.16em] uppercase text-zinc-400 hover:text-white px-2 transition-colors duration-200"
-              >
-                Vantage
-              </button>
-            </div>
+            <form
+              onSubmit={handleNavSearch}
+              role="search"
+              className="flex-1 min-w-0 max-w-md mx-auto"
+            >
+              <div className="flex items-center gap-2 h-9 rounded-xl bg-black/45 ring-1 ring-white/10 pl-3 pr-2 transition-shadow duration-200 focus-within:ring-white/25">
+                <HiSearch className="w-3.5 h-3.5 shrink-0 text-zinc-500" />
+                <input
+                  type="text"
+                  value={navQuery}
+                  onChange={(e) => setNavQuery(e.target.value)}
+                  placeholder="Search another player…"
+                  aria-label="Search another player"
+                  spellCheck={false}
+                  autoComplete="off"
+                  className="min-w-0 flex-1 bg-transparent text-xs sm:text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none"
+                />
+              </div>
+            </form>
 
             <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
               <button

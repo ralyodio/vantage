@@ -209,8 +209,14 @@ export default function Home() {
           className="sticky top-0 z-40 px-3 pt-3 sm:px-4 sm:pt-4"
         >
           <header className="mx-auto flex h-12 max-w-6xl items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-[#111113]/92 px-3 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-14 sm:px-4">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-300">
-              Vantage
+            <span className="flex h-8 items-center">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={LOGOS.brand}
+                alt="Vantage"
+                className="h-full w-auto object-contain"
+                draggable={false}
+              />
             </span>
             <div className="flex items-center gap-2 rounded-lg bg-black/45 px-2.5 py-1.5 ring-1 ring-white/10">
               <HiSearch className="h-3.5 w-3.5 text-zinc-500" />
@@ -229,25 +235,47 @@ export default function Home() {
         </motion.div>
 
         <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-3 pb-16 pt-14 sm:px-4 sm:pt-20">
-          {/* Hero with map marquee + floating map icons */}
+          {/* Hero: angled counter-scrolling map strips + floating icons */}
           <div className="relative w-full text-center">
-            {/* slow marquee of sharp map shots behind the copy */}
+            {/* back strip: slower, drifts right, tilted up */}
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2 w-[max(100vw,72rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden opacity-[0.13] [mask-image:linear-gradient(90deg,transparent,black_18%,black_82%,transparent)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 w-[max(120vw,90rem)] -translate-x-1/2 -translate-y-[62%] rotate-[2.5deg] overflow-hidden opacity-[0.10] [mask-image:linear-gradient(90deg,transparent,black_22%,black_78%,transparent)]"
+            >
+              <motion.div
+                className="flex w-max gap-3 py-2"
+                animate={{ x: ['-50%', '0%'] }}
+                transition={{ duration: 160, ease: 'linear', repeat: Infinity }}
+              >
+                {[...MAP_KEYS].reverse().concat([...MAP_KEYS].reverse()).map((m, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={`b-${m}-${i}`}
+                    src={getMapBanner(m)}
+                    alt=""
+                    className="h-32 w-56 shrink-0 rounded-xl object-cover sm:h-40 sm:w-72"
+                  />
+                ))}
+              </motion.div>
+            </div>
+
+            {/* front strip: faster, drifts left, tilted down */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-1/2 w-[max(110vw,80rem)] -translate-x-1/2 -translate-y-[46%] rotate-[-2deg] overflow-hidden opacity-[0.16] [mask-image:linear-gradient(90deg,transparent,black_20%,black_80%,transparent)]"
             >
               <motion.div
                 className="flex w-max gap-3 py-2"
                 animate={{ x: ['0%', '-50%'] }}
-                transition={{ duration: 90, ease: 'linear', repeat: Infinity }}
+                transition={{ duration: 110, ease: 'linear', repeat: Infinity }}
               >
                 {[...MAP_KEYS, ...MAP_KEYS].map((m, i) => (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    key={`${m}-${i}`}
+                    key={`f-${m}-${i}`}
                     src={getMapBanner(m)}
                     alt=""
-                    className="h-36 w-64 shrink-0 rounded-xl object-cover sm:h-44 sm:w-80"
+                    className="h-32 w-56 shrink-0 rounded-xl object-cover sm:h-40 sm:w-72"
                   />
                 ))}
               </motion.div>
@@ -291,7 +319,7 @@ export default function Home() {
               </span>
             </motion.div>
 
-            <h1 className="relative z-10 font-bold tracking-tight text-white">
+            <h1 className="relative z-10 font-bold tracking-tight text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.65)]">
               <span className="block overflow-hidden pb-2">
                 <motion.span
                   initial={{ y: '110%' }}
@@ -308,7 +336,7 @@ export default function Home() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.4, ease, delay: 0.28 }}
-              className="relative z-10 mt-4 text-sm text-zinc-400 sm:text-base"
+              className="relative z-10 mt-4 text-sm text-zinc-400 [text-shadow:0_1px_12px_rgba(0,0,0,0.8)] sm:text-base"
             >
               Threat scores, premier ranks and match forensics for any CS2
               player.

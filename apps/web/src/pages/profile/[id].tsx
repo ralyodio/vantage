@@ -127,9 +127,16 @@ export default function ProfilePage() {
             <button
               type="button"
               onClick={() => router.push('/')}
-              className="hidden sm:inline text-[11px] font-semibold tracking-[0.16em] uppercase text-zinc-400 hover:text-white px-1 transition-colors duration-200 shrink-0"
+              aria-label="Vantage home"
+              className="flex h-8 shrink-0 items-center px-1 transition-opacity duration-200 hover:opacity-80"
             >
-              Vantage
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={LOGOS.brand}
+                alt="Vantage"
+                className="h-full w-auto object-contain"
+                draggable={false}
+              />
             </button>
 
             <form

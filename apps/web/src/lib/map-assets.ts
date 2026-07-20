@@ -145,6 +145,7 @@ export function getPremierTier(rating?: number | null): number | null {
 }
 
 export const LOGOS = {
+  brand: '/logo.png',
   steam: '/logos/steam.svg',
   faceit: '/logos/faceit.svg',
   leetify: '/logos/leetify.svg',

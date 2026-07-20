@@ -8,13 +8,34 @@ import { HiSearch, HiShieldCheck, HiDocumentSearch } from 'react-icons/hi';
 import SearchBar from '../components/SearchBar';
 import AnimatedCounter from '../components/AnimatedCounter';
 import CaptchaModal from '../components/CaptchaModal';
-import { LOGOS } from '../lib/map-assets';
+import { LOGOS, getMapBanner, getMapIcon } from '../lib/map-assets';
 import { RISK_FLAG_CATEGORIES } from '@vantage/shared';
 
 const ease = [0.22, 1, 0.36, 1] as const;
 
 const RISK_SIGNALS = Object.keys(RISK_FLAG_CATEGORIES).length;
 const MAPS_TRACKED = 13;
+
+const MAP_KEYS = [
+  'de_mirage',
+  'de_inferno',
+  'de_dust2',
+  'de_nuke',
+  'de_ancient',
+  'de_anubis',
+  'de_vertigo',
+  'de_train',
+] as const;
+
+/** floating map icons scattered around the hero */
+const FLOATING_MAPS = [
+  { map: 'de_mirage', pos: 'left-[4%] top-[22%]', size: 'h-14 w-14', opacity: 'opacity-30', duration: 5.5, delay: 0, hide: 'hidden lg:block' },
+  { map: 'de_dust2', pos: 'right-[5%] top-[18%]', size: 'h-12 w-12', opacity: 'opacity-30', duration: 6.5, delay: 0.6, hide: 'hidden lg:block' },
+  { map: 'de_inferno', pos: 'right-[9%] top-[62%]', size: 'h-14 w-14', opacity: 'opacity-25', duration: 6, delay: 1.1, hide: 'hidden md:block' },
+  { map: 'de_nuke', pos: 'left-[9%] top-[64%]', size: 'h-10 w-10', opacity: 'opacity-25', duration: 7, delay: 0.3, hide: 'hidden md:block' },
+  { map: 'de_ancient', pos: 'left-[24%] top-[6%]', size: 'h-8 w-8', opacity: 'opacity-20', duration: 7.5, delay: 1.6, hide: 'hidden sm:block' },
+  { map: 'de_anubis', pos: 'right-[24%] top-[5%]', size: 'h-8 w-8', opacity: 'opacity-20', duration: 6.8, delay: 0.9, hide: 'hidden sm:block' },
+] as const;
 
 export default function Home() {
   const router = useRouter();
@@ -123,7 +144,7 @@ export default function Home() {
     {
       kicker: 'Aggregation',
       title: 'Unified Intel',
-      desc: 'Steam, FACEIT and Leetify merged into one profile — ranks, cosmetics, ELO and aim mechanics in a single view.',
+      desc: 'Steam, FACEIT and Leetify merged into a single profile with ranks, cosmetics, ELO and aim mechanics.',
       logoRow: true,
       banner: '/maps/thumbs/de_mirage.png',
     },
@@ -164,7 +185,7 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Vantage — CS2 Intelligence Platform</title>
+        <title>Vantage · CS2 Intelligence Platform</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </Head>
 
@@ -208,13 +229,58 @@ export default function Home() {
         </motion.div>
 
         <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-3 pb-16 pt-14 sm:px-4 sm:pt-20">
-          {/* Hero — masked line reveal */}
-          <div className="text-center">
+          {/* Hero with map marquee + floating map icons */}
+          <div className="relative w-full text-center">
+            {/* slow marquee of sharp map shots behind the copy */}
+            <div
+              aria-hidden
+              className="pointer-events-none absolute left-1/2 top-1/2 w-[max(100vw,72rem)] -translate-x-1/2 -translate-y-1/2 overflow-hidden opacity-[0.13] [mask-image:linear-gradient(90deg,transparent,black_18%,black_82%,transparent)]"
+            >
+              <motion.div
+                className="flex w-max gap-3 py-2"
+                animate={{ x: ['0%', '-50%'] }}
+                transition={{ duration: 90, ease: 'linear', repeat: Infinity }}
+              >
+                {[...MAP_KEYS, ...MAP_KEYS].map((m, i) => (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    key={`${m}-${i}`}
+                    src={getMapBanner(m)}
+                    alt=""
+                    className="h-36 w-64 shrink-0 rounded-xl object-cover sm:h-44 sm:w-80"
+                  />
+                ))}
+              </motion.div>
+            </div>
+
+            {/* floating map icons */}
+            {FLOATING_MAPS.map((f) => (
+              <motion.div
+                key={f.map}
+                aria-hidden
+                className={`pointer-events-none absolute z-[1] ${f.pos} ${f.size} ${f.opacity} ${f.hide}`}
+                animate={{ y: [0, -10, 0] }}
+                transition={{
+                  duration: f.duration,
+                  delay: f.delay,
+                  repeat: Infinity,
+                  ease: 'easeInOut',
+                }}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={getMapIcon(f.map)}
+                  alt=""
+                  className="h-full w-full object-contain drop-shadow-[0_10px_24px_rgba(0,0,0,0.65)]"
+                />
+              </motion.div>
+            ))}
+
             <motion.div
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease }}
-              className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-white/[0.03] px-3 py-1.5"
+              className="relative z-10 mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-black/45 px-3 py-1.5 backdrop-blur-sm"
             >
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
@@ -225,29 +291,15 @@ export default function Home() {
               </span>
             </motion.div>
 
-            <h1 className="font-bold uppercase leading-[0.95] tracking-tight">
-              <span className="block overflow-hidden pb-1">
-                <motion.span
-                  initial={{ y: '110%' }}
-                  animate={{ y: 0 }}
-                  transition={{ duration: 0.55, ease, delay: 0.08 }}
-                  className="block text-5xl text-white sm:text-6xl md:text-7xl"
-                >
-                  See what
-                </motion.span>
-              </span>
+            <h1 className="relative z-10 font-bold tracking-tight text-white">
               <span className="block overflow-hidden pb-2">
                 <motion.span
                   initial={{ y: '110%' }}
                   animate={{ y: 0 }}
-                  transition={{ duration: 0.55, ease, delay: 0.18 }}
-                  className="block text-5xl sm:text-6xl md:text-7xl"
+                  transition={{ duration: 0.55, ease, delay: 0.1 }}
+                  className="block text-4xl sm:text-5xl md:text-6xl"
                 >
-                  <span className="text-white">they&apos;re </span>
-                  <span className="text-transparent [-webkit-text-stroke:1.5px_rgba(255,255,255,0.6)]">
-                    hiding
-                  </span>
-                  <span className="text-emerald-400">.</span>
+                  See what they&apos;re hiding.
                 </motion.span>
               </span>
             </h1>
@@ -255,11 +307,11 @@ export default function Home() {
             <motion.p
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 0.4, ease, delay: 0.34 }}
-              className="mt-5 max-w-md text-sm leading-relaxed text-zinc-400 sm:text-base"
+              transition={{ duration: 0.4, ease, delay: 0.28 }}
+              className="relative z-10 mt-4 text-sm text-zinc-400 sm:text-base"
             >
-              Steam, FACEIT and Leetify intel — threat scores, premier ranks
-              and full match forensics for any CS2 player.
+              Threat scores, premier ranks and match forensics for any CS2
+              player.
             </motion.p>
           </div>
 
@@ -267,8 +319,8 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease, delay: 0.3 }}
-            className="mt-9 w-full max-w-2xl"
+            transition={{ duration: 0.4, ease, delay: 0.4 }}
+            className="mt-10 w-full max-w-2xl"
           >
             <SearchBar onSearch={handleSearch} isLoading={isSearching} />
 
@@ -282,7 +334,7 @@ export default function Home() {
                   type="button"
                   onClick={() => handleSearch(ex.query)}
                   disabled={isSearching}
-                  title={`${ex.kind} — ${ex.query}`}
+                  title={`${ex.kind}: ${ex.query}`}
                   className="group/chip inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-400 transition-colors duration-200 hover:border-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-40"
                 >
                   {ex.label}
@@ -298,7 +350,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4, ease, delay: 0.42 }}
+            transition={{ duration: 0.4, ease, delay: 0.5 }}
             className="mt-12 w-full max-w-3xl overflow-hidden rounded-xl border border-white/[0.08] bg-[#111113]"
           >
             <div className="grid grid-cols-2 gap-px bg-white/[0.05] sm:grid-cols-4">
@@ -330,7 +382,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, ease, delay: 0.52 }}
+            transition={{ duration: 0.45, ease, delay: 0.6 }}
             className="mt-12 grid w-full grid-cols-1 gap-3 sm:grid-cols-3"
           >
             {features.map((f) => (
@@ -381,7 +433,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.45, ease, delay: 0.62 }}
+            transition={{ duration: 0.45, ease, delay: 0.7 }}
             className="mt-12 w-full max-w-3xl"
           >
             <div className="flex items-center gap-3">

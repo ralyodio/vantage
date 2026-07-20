@@ -474,7 +474,7 @@ function PremierBadge({ rating }: { rating?: number | null }) {
       title={
         rated && label
           ? `Premier CS Rating ${label}`
-          : 'Premier CS Rating — unrated'
+          : 'Premier CS Rating (unrated)'
       }
     >
       {/* eslint-disable-next-line @next/next/no-img-element */}

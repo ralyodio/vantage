@@ -128,7 +128,7 @@ export default function ProfilePage() {
               type="button"
               onClick={() => router.push('/')}
               aria-label="Vantage home"
-              className="flex h-6 shrink-0 items-center px-1 transition-opacity duration-200 hover:opacity-80 sm:h-7"
+              className="flex h-5 shrink-0 items-center px-1 transition-opacity duration-200 hover:opacity-80 sm:h-6"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

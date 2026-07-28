@@ -209,7 +209,7 @@ export default function Home() {
           className="sticky top-0 z-40 px-3 pt-3 sm:px-4 sm:pt-4"
         >
           <header className="mx-auto flex h-12 max-w-6xl items-center justify-between gap-3 rounded-2xl border border-white/[0.08] bg-[#111113]/92 px-3 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl sm:h-14 sm:px-4">
-            <span className="flex h-6 items-center sm:h-7">
+            <span className="flex h-5 items-center sm:h-6">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={LOGOS.brand}
@@ -240,7 +240,7 @@ export default function Home() {
             {/* back strip: slower, drifts right, steep tilt up */}
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(130vw,100rem)] -translate-x-1/2 -translate-y-1/2 rotate-[8deg] overflow-hidden opacity-[0.10] [mask-image:linear-gradient(90deg,transparent,black_25%,black_75%,transparent)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(130vw,100rem)] -translate-x-1/2 -translate-y-[40%] rotate-[8deg] overflow-hidden opacity-[0.10] [mask-image:linear-gradient(90deg,transparent,black_25%,black_75%,transparent)]"
             >
               <motion.div
                 className="flex w-max gap-3 py-2"
@@ -262,7 +262,7 @@ export default function Home() {
             {/* front strip: faster, drifts left, steeper tilt down */}
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(120vw,92rem)] -translate-x-1/2 -translate-y-1/2 rotate-[-6deg] overflow-hidden opacity-[0.16] [mask-image:linear-gradient(90deg,transparent,black_22%,black_78%,transparent)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(120vw,92rem)] -translate-x-1/2 -translate-y-[36%] rotate-[-6deg] overflow-hidden opacity-[0.16] [mask-image:linear-gradient(90deg,transparent,black_22%,black_78%,transparent)]"
             >
               <motion.div
                 className="flex w-max gap-3 py-2"

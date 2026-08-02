@@ -29,12 +29,12 @@ const MAP_KEYS = [
 
 /** floating map icons scattered around the hero */
 const FLOATING_MAPS = [
-  { map: 'de_mirage', pos: 'left-[5%] top-[46%]', size: 'h-16 w-16', opacity: 'opacity-50', duration: 5.5, delay: 0, hide: 'hidden lg:block' },
-  { map: 'de_dust2', pos: 'right-[6%] top-[40%]', size: 'h-14 w-14', opacity: 'opacity-50', duration: 6.5, delay: 0.6, hide: 'hidden lg:block' },
-  { map: 'de_inferno', pos: 'right-[11%] top-[78%]', size: 'h-16 w-16', opacity: 'opacity-45', duration: 6, delay: 1.1, hide: 'hidden md:block' },
-  { map: 'de_nuke', pos: 'left-[10%] top-[80%]', size: 'h-12 w-12', opacity: 'opacity-45', duration: 7, delay: 0.3, hide: 'hidden md:block' },
-  { map: 'de_ancient', pos: 'left-[26%] top-[62%]', size: 'h-10 w-10', opacity: 'opacity-40', duration: 7.5, delay: 1.6, hide: 'hidden sm:block' },
-  { map: 'de_anubis', pos: 'right-[26%] top-[60%]', size: 'h-10 w-10', opacity: 'opacity-40', duration: 6.8, delay: 0.9, hide: 'hidden sm:block' },
+  { map: 'de_mirage', pos: 'left-[5%] top-[46%]', size: 'h-16 w-16', opacity: 'opacity-85', duration: 5.5, delay: 0, hide: 'hidden lg:block' },
+  { map: 'de_dust2', pos: 'right-[6%] top-[40%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 6.5, delay: 0.6, hide: 'hidden lg:block' },
+  { map: 'de_inferno', pos: 'right-[11%] top-[78%]', size: 'h-16 w-16', opacity: 'opacity-80', duration: 6, delay: 1.1, hide: 'hidden md:block' },
+  { map: 'de_nuke', pos: 'left-[10%] top-[80%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 7, delay: 0.3, hide: 'hidden md:block' },
+  { map: 'de_ancient', pos: 'left-[26%] top-[62%]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 7.5, delay: 1.6, hide: 'hidden sm:block' },
+  { map: 'de_anubis', pos: 'right-[26%] top-[60%]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 6.8, delay: 0.9, hide: 'hidden sm:block' },
 ] as const;
 
 export default function Home() {
@@ -308,15 +308,13 @@ export default function Home() {
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.35, ease }}
-              className="relative z-10 mb-6 inline-flex items-center gap-2 rounded-full border border-white/[0.1] bg-black/45 px-3 py-1.5 backdrop-blur-sm"
+              className="relative z-10 mb-6 flex items-center justify-center gap-3 px-4"
             >
-              <span className="relative flex h-1.5 w-1.5">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-emerald-400" />
+              <span className="h-px w-8 bg-gradient-to-r from-transparent to-white/30 sm:w-14" />
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-zinc-300 [text-shadow:0_1px_12px_rgba(0,0,0,0.9)]">
+                cs2 <span className="text-emerald-400">/</span> intel
               </span>
-              <span className="text-[10px] font-medium uppercase tracking-[0.22em] text-zinc-400">
-                CS2 Intelligence Platform
-              </span>
+              <span className="h-px w-8 bg-gradient-to-l from-transparent to-white/30 sm:w-14" />
             </motion.div>
 
             <h1 className="relative z-10 font-bold tracking-tight text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.65)]">

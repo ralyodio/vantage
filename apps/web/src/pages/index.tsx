@@ -237,10 +237,10 @@ export default function Home() {
         <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-3 pb-16 pt-14 sm:px-4 sm:pt-20">
           {/* Hero: angled counter-scrolling map strips + floating icons */}
           <div className="relative w-full text-center">
-            {/* back strip: slower, drifts right, steep tilt up */}
+            {/* back strip: higher band, slower drift right, gentle tilt */}
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(130vw,100rem)] -translate-x-1/2 -translate-y-[40%] rotate-[8deg] overflow-hidden opacity-[0.10] [mask-image:linear-gradient(90deg,transparent,black_25%,black_75%,transparent)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(130vw,100rem)] -translate-x-1/2 -translate-y-[64%] rotate-[5deg] overflow-hidden opacity-[0.10] [mask-image:linear-gradient(90deg,transparent,black_25%,black_75%,transparent)]"
             >
               <motion.div
                 className="flex w-max gap-3 py-2"
@@ -259,10 +259,10 @@ export default function Home() {
               </motion.div>
             </div>
 
-            {/* front strip: faster, drifts left, steeper tilt down */}
+            {/* front strip: lower band, faster drift left, gentle tilt */}
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(120vw,92rem)] -translate-x-1/2 -translate-y-[36%] rotate-[-6deg] overflow-hidden opacity-[0.16] [mask-image:linear-gradient(90deg,transparent,black_22%,black_78%,transparent)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(120vw,92rem)] -translate-x-1/2 -translate-y-[28%] rotate-[-4deg] overflow-hidden opacity-[0.16] [mask-image:linear-gradient(90deg,transparent,black_22%,black_78%,transparent)]"
             >
               <motion.div
                 className="flex w-max gap-3 py-2"

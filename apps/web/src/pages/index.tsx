@@ -28,13 +28,19 @@ const MAP_KEYS = [
 ] as const;
 
 /** floating map icons scattered around the hero */
+/**
+ * 3 icons per side arranged as arc parentheses: left forms ( and
+ * right forms ), framing the headline. Upper/middle/lower slots.
+ */
 const FLOATING_MAPS = [
-  { map: 'de_mirage', pos: 'left-[5%] top-[46%]', size: 'h-16 w-16', opacity: 'opacity-85', duration: 5.5, delay: 0, hide: 'hidden lg:block' },
-  { map: 'de_dust2', pos: 'right-[6%] top-[40%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 6.5, delay: 0.6, hide: 'hidden lg:block' },
-  { map: 'de_inferno', pos: 'right-[11%] top-[78%]', size: 'h-16 w-16', opacity: 'opacity-80', duration: 6, delay: 1.1, hide: 'hidden md:block' },
-  { map: 'de_nuke', pos: 'left-[10%] top-[80%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 7, delay: 0.3, hide: 'hidden md:block' },
-  { map: 'de_ancient', pos: 'left-[26%] top-[62%]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 7.5, delay: 1.6, hide: 'hidden sm:block' },
-  { map: 'de_anubis', pos: 'right-[26%] top-[60%]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 6.8, delay: 0.9, hide: 'hidden sm:block' },
+  // left "(" — upper, middle (bulge), lower
+  { map: 'de_mirage', pos: 'left-[7%] top-[8%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 6, delay: 0, hide: 'hidden md:block' },
+  { map: 'de_inferno', pos: 'left-[3.5%] top-[42%]', size: 'h-16 w-16', opacity: 'opacity-85', duration: 5.5, delay: 1.1, hide: 'hidden md:block' },
+  { map: 'de_nuke', pos: 'left-[7%] top-[76%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 7, delay: 0.4, hide: 'hidden md:block' },
+  // right ")" — upper, middle (bulge), lower
+  { map: 'de_dust2', pos: 'right-[7%] top-[8%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
+  { map: 'de_ancient', pos: 'right-[3.5%] top-[42%]', size: 'h-16 w-16', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
+  { map: 'de_anubis', pos: 'right-[7%] top-[76%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
 ] as const;
 
 export default function Home() {
@@ -303,19 +309,6 @@ export default function Home() {
                 />
               </motion.div>
             ))}
-
-            <motion.div
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.35, ease }}
-              className="relative z-10 mb-6 flex items-center justify-center gap-3 px-4"
-            >
-              <span className="h-px w-8 bg-gradient-to-r from-transparent to-white/30 sm:w-14" />
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.3em] text-zinc-300 [text-shadow:0_1px_12px_rgba(0,0,0,0.9)]">
-                cs2 <span className="text-emerald-400">/</span> intel
-              </span>
-              <span className="h-px w-8 bg-gradient-to-l from-transparent to-white/30 sm:w-14" />
-            </motion.div>
 
             <h1 className="relative z-10 font-bold tracking-tight text-white [text-shadow:0_2px_30px_rgba(0,0,0,0.65)]">
               <span className="block overflow-hidden pb-2">

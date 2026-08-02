@@ -29,12 +29,12 @@ const MAP_KEYS = [
 
 /** floating map icons scattered around the hero */
 const FLOATING_MAPS = [
-  { map: 'de_mirage', pos: 'left-[4%] top-[22%]', size: 'h-14 w-14', opacity: 'opacity-30', duration: 5.5, delay: 0, hide: 'hidden lg:block' },
-  { map: 'de_dust2', pos: 'right-[5%] top-[18%]', size: 'h-12 w-12', opacity: 'opacity-30', duration: 6.5, delay: 0.6, hide: 'hidden lg:block' },
-  { map: 'de_inferno', pos: 'right-[9%] top-[62%]', size: 'h-14 w-14', opacity: 'opacity-25', duration: 6, delay: 1.1, hide: 'hidden md:block' },
-  { map: 'de_nuke', pos: 'left-[9%] top-[64%]', size: 'h-10 w-10', opacity: 'opacity-25', duration: 7, delay: 0.3, hide: 'hidden md:block' },
-  { map: 'de_ancient', pos: 'left-[24%] top-[6%]', size: 'h-8 w-8', opacity: 'opacity-20', duration: 7.5, delay: 1.6, hide: 'hidden sm:block' },
-  { map: 'de_anubis', pos: 'right-[24%] top-[5%]', size: 'h-8 w-8', opacity: 'opacity-20', duration: 6.8, delay: 0.9, hide: 'hidden sm:block' },
+  { map: 'de_mirage', pos: 'left-[5%] top-[46%]', size: 'h-16 w-16', opacity: 'opacity-50', duration: 5.5, delay: 0, hide: 'hidden lg:block' },
+  { map: 'de_dust2', pos: 'right-[6%] top-[40%]', size: 'h-14 w-14', opacity: 'opacity-50', duration: 6.5, delay: 0.6, hide: 'hidden lg:block' },
+  { map: 'de_inferno', pos: 'right-[11%] top-[78%]', size: 'h-16 w-16', opacity: 'opacity-45', duration: 6, delay: 1.1, hide: 'hidden md:block' },
+  { map: 'de_nuke', pos: 'left-[10%] top-[80%]', size: 'h-12 w-12', opacity: 'opacity-45', duration: 7, delay: 0.3, hide: 'hidden md:block' },
+  { map: 'de_ancient', pos: 'left-[26%] top-[62%]', size: 'h-10 w-10', opacity: 'opacity-40', duration: 7.5, delay: 1.6, hide: 'hidden sm:block' },
+  { map: 'de_anubis', pos: 'right-[26%] top-[60%]', size: 'h-10 w-10', opacity: 'opacity-40', duration: 6.8, delay: 0.9, hide: 'hidden sm:block' },
 ] as const;
 
 export default function Home() {
@@ -240,7 +240,7 @@ export default function Home() {
             {/* back strip: higher band, slower drift right, gentle tilt */}
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(130vw,100rem)] -translate-x-1/2 -translate-y-[64%] rotate-[5deg] overflow-hidden opacity-[0.10] [mask-image:linear-gradient(90deg,transparent,black_25%,black_75%,transparent)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(130vw,100rem)] -translate-x-1/2 -translate-y-[38%] rotate-[5deg] overflow-hidden opacity-[0.16] [mask-image:linear-gradient(90deg,transparent,black_25%,black_75%,transparent)]"
             >
               <motion.div
                 className="flex w-max gap-3 py-2"
@@ -262,7 +262,7 @@ export default function Home() {
             {/* front strip: lower band, faster drift left, gentle tilt */}
             <div
               aria-hidden
-              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(120vw,92rem)] -translate-x-1/2 -translate-y-[28%] rotate-[-4deg] overflow-hidden opacity-[0.16] [mask-image:linear-gradient(90deg,transparent,black_22%,black_78%,transparent)]"
+              className="pointer-events-none absolute left-1/2 top-1/2 h-[150%] w-[max(120vw,92rem)] -translate-x-1/2 -translate-y-[6%] rotate-[-4deg] overflow-hidden opacity-[0.22] [mask-image:linear-gradient(90deg,transparent,black_22%,black_78%,transparent)]"
             >
               <motion.div
                 className="flex w-max gap-3 py-2"
@@ -286,7 +286,7 @@ export default function Home() {
               <motion.div
                 key={f.map}
                 aria-hidden
-                className={`pointer-events-none absolute z-[1] ${f.pos} ${f.size} ${f.opacity} ${f.hide}`}
+                className={`pointer-events-none absolute z-[5] ${f.pos} ${f.size} ${f.opacity} ${f.hide}`}
                 animate={{ y: [0, -10, 0] }}
                 transition={{
                   duration: f.duration,

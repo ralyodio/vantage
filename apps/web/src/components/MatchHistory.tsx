@@ -184,7 +184,7 @@ export default function MatchHistory({
                   setIsRefreshing(false);
                 }}
                 disabled={isRefreshing}
-                className="text-xs text-zinc-500 hover:text-zinc-200 disabled:opacity-50 shrink-0 transition-colors duration-200"
+                className="text-xs text-zinc-500 hover:text-zinc-200 disabled:opacity-50 shrink-0 -m-1 px-2 py-2 transition-colors duration-200"
               >
                 {isRefreshing ? 'Refreshing…' : 'Refresh'}
               </button>

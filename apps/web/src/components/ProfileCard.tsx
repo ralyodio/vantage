@@ -111,12 +111,17 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
 
         <div className="relative z-10 flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-5 p-4 sm:p-5">
           {/*
+            Mobile: avatar + Level share a row (wrapper is display:contents
+            at sm+, so desktop keeps the original single-row layout).
+          */}
+          <div className="flex items-start justify-between gap-3 sm:contents">
+          {/*
             Avatar stack:
             - Square avatar (Steam profile style)
             - Equipped frame PNG when present
             - Level-colored border only when no frame
           */}
-          <div className="relative shrink-0 w-[128px] h-[128px] sm:w-[148px] sm:h-[148px]">
+          <div className="relative shrink-0 w-[96px] h-[96px] sm:w-[148px] sm:h-[148px]">
             {steam.avatarFrame ? (
               <>
                 <div className="absolute inset-[10%] rounded-md overflow-hidden bg-zinc-900">
@@ -260,13 +265,15 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
             </div>
           </div>
 
-          {/* Steam-style: "Level" + friendPlayerLevel circle — far right of hero */}
+          {/* Steam-style: "Level" + friendPlayerLevel circle —
+              mobile: beside avatar; desktop: far right of hero */}
           {steam.level != null && (
             <div className="flex items-center gap-2.5 shrink-0 sm:ml-auto self-start sm:self-center">
               <span className="text-base sm:text-lg text-zinc-300 drop-shadow">Level</span>
               <SteamLevelBadge level={steam.level} style={levelStyle} />
             </div>
           )}
+          </div>
         </div>
       </section>
 
@@ -278,7 +285,7 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
         {kpis.map((k) => (
           <div
             key={k.label}
-            className="snap-start shrink-0 w-[42%] xs:w-[38%] sm:w-auto sm:flex-1 min-w-[7.5rem] rounded-xl border border-white/[0.08] bg-[#111113] px-3.5 py-3 flex flex-col"
+            className="snap-start shrink-0 w-[46%] xs:w-[42%] sm:w-auto sm:flex-1 min-w-[8.5rem] sm:min-w-[7.5rem] rounded-xl border border-white/[0.08] bg-[#111113] px-3.5 py-3 flex flex-col"
           >
             <div className="text-[11px] font-medium text-zinc-500 uppercase tracking-wide mb-1">
               {k.label}

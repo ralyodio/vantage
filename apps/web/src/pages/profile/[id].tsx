@@ -154,7 +154,7 @@ export default function ProfilePage() {
                   aria-label="Search another player"
                   spellCheck={false}
                   autoComplete="off"
-                  className="min-w-0 flex-1 bg-transparent text-xs sm:text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none"
+                  className="min-w-0 flex-1 bg-transparent text-[16px] leading-none sm:text-sm text-zinc-100 placeholder-zinc-600 focus:outline-none"
                 />
               </div>
             </form>
@@ -197,7 +197,7 @@ export default function ProfilePage() {
           </header>
         </div>
 
-        <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-16 sm:pb-20">
+        <main className="max-w-6xl mx-auto px-3 sm:px-4 py-4 sm:py-6 pb-[max(4rem,env(safe-area-inset-bottom))] sm:pb-20">
           <AnimatePresence mode="wait">
             {refreshError && (
               <motion.div

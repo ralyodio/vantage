@@ -31,6 +31,7 @@ const MAP_KEYS = [
 /**
  * 3 icons per side, arc-shaped but with irregular spacing/heights so it
  * reads scattered rather than a rigid ( ). Left leans (, right leans ).
+ * Plus 2 mobile-only accents at the screen edges.
  */
 const FLOATING_MAPS = [
   // left side
@@ -41,6 +42,9 @@ const FLOATING_MAPS = [
   { map: 'de_dust2', pos: 'right-[14%] top-[6%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
   { map: 'de_ancient', pos: 'right-[2%] top-[50%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
   { map: 'de_anubis', pos: 'right-[12%] top-[96%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
+  // mobile-only accents at the very edges
+  { map: 'de_vertigo', pos: 'left-[1%] top-[30%]', size: 'h-8 w-8', opacity: 'opacity-60', duration: 6.8, delay: 0.2, hide: 'md:hidden' },
+  { map: 'de_train', pos: 'right-[1%] top-[64%]', size: 'h-8 w-8', opacity: 'opacity-60', duration: 7.4, delay: 1.3, hide: 'md:hidden' },
 ] as const;
 
 export default function Home() {
@@ -259,7 +263,7 @@ export default function Home() {
                     key={`b-${m}-${i}`}
                     src={getMapBanner(m)}
                     alt=""
-                    className="h-32 w-56 shrink-0 rounded-xl object-cover sm:h-40 sm:w-72"
+                    className="h-24 w-44 shrink-0 rounded-xl object-cover sm:h-40 sm:w-72"
                   />
                 ))}
               </motion.div>
@@ -281,7 +285,7 @@ export default function Home() {
                     key={`f-${m}-${i}`}
                     src={getMapBanner(m)}
                     alt=""
-                    className="h-32 w-56 shrink-0 rounded-xl object-cover sm:h-40 sm:w-72"
+                    className="h-24 w-44 shrink-0 rounded-xl object-cover sm:h-40 sm:w-72"
                   />
                 ))}
               </motion.div>
@@ -482,7 +486,7 @@ export default function Home() {
         </main>
 
         {/* Footer */}
-        <footer className="relative z-10 border-t border-white/[0.06] px-4 py-6">
+        <footer className="relative z-10 border-t border-white/[0.06] px-4 py-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
           <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-3 sm:flex-row">
             <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-zinc-600">
               <span>Data provided by</span>

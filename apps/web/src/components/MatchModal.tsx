@@ -98,12 +98,16 @@ export default function MatchModal({
             role="dialog"
             aria-modal="true"
             aria-label="Match scoreboard"
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 12 }}
-            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
-            className="relative w-full sm:max-w-[720px] max-h-[100dvh] sm:max-h-[min(860px,90vh)] bg-[#101114] sm:rounded-lg border-t sm:border border-[#2a2c32] shadow-2xl flex flex-col overflow-hidden"
+            exit={{ opacity: 0, y: 30 }}
+            transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+            className="relative w-full sm:max-w-[720px] max-h-[100dvh] sm:max-h-[min(860px,90vh)] bg-[#101114] rounded-t-2xl sm:rounded-lg border-t sm:border border-[#2a2c32] shadow-2xl flex flex-col overflow-hidden pb-[env(safe-area-inset-bottom)]"
           >
+            {/* mobile bottom-sheet drag handle */}
+            <div className="flex justify-center pt-2 sm:hidden" aria-hidden>
+              <span className="h-1 w-10 rounded-full bg-white/15" />
+            </div>
             {loading || !match ? (
               <LoadingState onClose={onClose} />
             ) : (

@@ -145,7 +145,7 @@ function StatChip({
   tone?: string;
 }) {
   return (
-    <div className="rounded-md bg-black/45 px-2 py-1 ring-1 ring-white/10 backdrop-blur-sm">
+    <div className="shrink-0 rounded-md bg-black/45 px-2 py-1 ring-1 ring-white/10 backdrop-blur-sm">
       {label && (
         <div className="text-[9px] font-medium uppercase tracking-wide text-zinc-400">
           {label}
@@ -346,7 +346,7 @@ export function LeetifyMatchCard({
               Scoreboard
             </button>
             {hasPlayer && (
-              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-black/40 text-sm font-medium text-white/80 ring-1 ring-white/15">
+              <span className="flex h-9 w-9 sm:h-7 sm:w-7 items-center justify-center rounded-md bg-black/40 text-base sm:text-sm font-medium text-white/80 ring-1 ring-white/15">
                 <motion.span
                   animate={{ rotate: expanded ? 45 : 0 }}
                   transition={iconTransition}
@@ -361,7 +361,7 @@ export function LeetifyMatchCard({
       </div>
 
       {/* Mobile secondary stats */}
-      <div className="relative z-10 flex gap-1.5 border-t border-white/10 bg-black/35 px-3 py-2 sm:hidden">
+      <div className="relative z-10 flex gap-1.5 border-t border-white/10 bg-black/35 px-3 py-2 sm:hidden overflow-x-auto scrollbar-thin">
         <StatChip
           label="Rating"
           value={
@@ -606,7 +606,7 @@ export function FaceitMatchCard({
               Scoreboard
             </button>
             {hasDetails && (
-              <span className="flex h-7 w-7 items-center justify-center rounded-md bg-black/40 text-sm font-medium text-white/80 ring-1 ring-white/15">
+              <span className="flex h-9 w-9 sm:h-7 sm:w-7 items-center justify-center rounded-md bg-black/40 text-base sm:text-sm font-medium text-white/80 ring-1 ring-white/15">
                 <motion.span
                   animate={{ rotate: expanded ? 45 : 0 }}
                   transition={iconTransition}
@@ -621,7 +621,7 @@ export function FaceitMatchCard({
       </div>
 
       {/* Mobile secondary stats */}
-      <div className="relative z-10 flex gap-1.5 border-t border-white/10 bg-black/35 px-3 py-2 sm:hidden">
+      <div className="relative z-10 flex gap-1.5 border-t border-white/10 bg-black/35 px-3 py-2 sm:hidden overflow-x-auto scrollbar-thin">
         <StatChip label="K/D" value={kd} tone="text-white" />
         <StatChip label="K-D-A" value={kda} tone="text-white" />
         {match.hsPercent != null && (

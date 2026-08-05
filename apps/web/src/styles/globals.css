@@ -93,6 +93,8 @@
 
 html {
   -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+  scroll-padding-top: 5rem;
 }
 
 body {
@@ -101,12 +103,22 @@ body {
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
   transition: background-color 0.3s ease, color 0.3s ease;
   overflow-x: hidden;
+  text-rendering: optimizeLegibility;
+}
+
+/* Phones: respect the notch/home-indicator when scrolling to edges */
+@media (max-width: 639px) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 /* Profile / dark surfaces: quieter scrollbars */
 .scrollbar-thin {
   scrollbar-width: thin;
   scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+  -webkit-overflow-scrolling: touch;
 }
 .scrollbar-thin::-webkit-scrollbar {
   height: 6px;

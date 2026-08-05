@@ -29,18 +29,18 @@ const MAP_KEYS = [
 
 /** floating map icons scattered around the hero */
 /**
- * 3 icons per side arranged as arc parentheses: left forms ( and
- * right forms ), framing the headline. Upper/middle/lower slots.
+ * 3 icons per side, arc-shaped but with irregular spacing/heights so it
+ * reads scattered rather than a rigid ( ). Left leans (, right leans ).
  */
 const FLOATING_MAPS = [
-  // left "(" — upper, middle (bulge), lower
-  { map: 'de_mirage', pos: 'left-[7%] top-[8%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 6, delay: 0, hide: 'hidden md:block' },
-  { map: 'de_inferno', pos: 'left-[3.5%] top-[42%]', size: 'h-16 w-16', opacity: 'opacity-85', duration: 5.5, delay: 1.1, hide: 'hidden md:block' },
-  { map: 'de_nuke', pos: 'left-[7%] top-[76%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 7, delay: 0.4, hide: 'hidden md:block' },
-  // right ")" — upper, middle (bulge), lower
-  { map: 'de_dust2', pos: 'right-[7%] top-[8%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
-  { map: 'de_ancient', pos: 'right-[3.5%] top-[42%]', size: 'h-16 w-16', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
-  { map: 'de_anubis', pos: 'right-[7%] top-[76%]', size: 'h-12 w-12', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
+  // left side
+  { map: 'de_mirage', pos: 'left-[9%] top-[4%]', size: 'h-9 w-9', opacity: 'opacity-80', duration: 6, delay: 0, hide: 'hidden md:block' },
+  { map: 'de_inferno', pos: 'left-[3%] top-[34%]', size: 'h-12 w-12', opacity: 'opacity-85', duration: 5.5, delay: 1.1, hide: 'hidden md:block' },
+  { map: 'de_nuke', pos: 'left-[10%] top-[82%]', size: 'h-9 w-9', opacity: 'opacity-80', duration: 7, delay: 0.4, hide: 'hidden md:block' },
+  // right side
+  { map: 'de_dust2', pos: 'right-[11%] top-[11%]', size: 'h-9 w-9', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
+  { map: 'de_ancient', pos: 'right-[3%] top-[46%]', size: 'h-12 w-12', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
+  { map: 'de_anubis', pos: 'right-[9%] top-[88%]', size: 'h-9 w-9', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
 ] as const;
 
 export default function Home() {

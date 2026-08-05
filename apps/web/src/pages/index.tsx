@@ -34,13 +34,13 @@ const MAP_KEYS = [
  */
 const FLOATING_MAPS = [
   // left side
-  { map: 'de_mirage', pos: 'left-[9%] top-[4%]', size: 'h-9 w-9', opacity: 'opacity-80', duration: 6, delay: 0, hide: 'hidden md:block' },
-  { map: 'de_inferno', pos: 'left-[3%] top-[34%]', size: 'h-12 w-12', opacity: 'opacity-85', duration: 5.5, delay: 1.1, hide: 'hidden md:block' },
-  { map: 'de_nuke', pos: 'left-[10%] top-[82%]', size: 'h-9 w-9', opacity: 'opacity-80', duration: 7, delay: 0.4, hide: 'hidden md:block' },
+  { map: 'de_mirage', pos: 'left-[12%] top-[-2%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 6, delay: 0, hide: 'hidden md:block' },
+  { map: 'de_inferno', pos: 'left-[2%] top-[38%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 5.5, delay: 1.1, hide: 'hidden md:block' },
+  { map: 'de_nuke', pos: 'left-[13%] top-[88%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 7, delay: 0.4, hide: 'hidden md:block' },
   // right side
-  { map: 'de_dust2', pos: 'right-[11%] top-[11%]', size: 'h-9 w-9', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
-  { map: 'de_ancient', pos: 'right-[3%] top-[46%]', size: 'h-12 w-12', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
-  { map: 'de_anubis', pos: 'right-[9%] top-[88%]', size: 'h-9 w-9', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
+  { map: 'de_dust2', pos: 'right-[14%] top-[6%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
+  { map: 'de_ancient', pos: 'right-[2%] top-[50%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
+  { map: 'de_anubis', pos: 'right-[12%] top-[96%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
 ] as const;
 
 export default function Home() {

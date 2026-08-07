@@ -246,7 +246,7 @@ export default function Home() {
 
         <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-3 pb-16 pt-14 sm:px-4 sm:pt-20">
           {/* Hero: angled counter-scrolling map strips + floating icons */}
-          <div className="relative w-full text-center">
+          <div className="relative w-full text-center overflow-hidden sm:overflow-visible">
             {/* back strip: higher band, slower drift right, gentle tilt */}
             <div
               aria-hidden

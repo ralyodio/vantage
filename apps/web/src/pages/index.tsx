@@ -42,9 +42,6 @@ const FLOATING_MAPS = [
   { map: 'de_dust2', pos: 'right-[14%] top-[6%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
   { map: 'de_ancient', pos: 'right-[2%] top-[50%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
   { map: 'de_anubis', pos: 'right-[12%] top-[96%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
-  // mobile-only accents, slotted in the clear zone between the tilted bands
-  { map: 'de_vertigo', pos: 'left-[3%] top-[40%]', size: 'h-9 w-9', opacity: 'opacity-70', duration: 6.8, delay: 0.2, hide: 'md:hidden' },
-  { map: 'de_train', pos: 'right-[3%] top-[86%]', size: 'h-9 w-9', opacity: 'opacity-70', duration: 7.4, delay: 1.3, hide: 'md:hidden' },
 ] as const;
 
 export default function Home() {
@@ -245,59 +242,9 @@ export default function Home() {
         </motion.div>
 
         <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-3 pb-16 pt-14 sm:px-4 sm:pt-20">
-          {/* Hero: rotated marquee bands + floating icons.
-              Mobile: fixed-height windows with vertical fades so the rotated
-              oversized layers never show clipped corners. Desktop: same
-              angled counter-scrolling pair as before. */}
-          <div className="relative w-full min-h-[30rem] overflow-hidden text-center sm:min-h-0 sm:overflow-visible">
-            {/* mobile-only: upper tilted window (drifts left, faint) */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-0 h-[11rem] overflow-hidden opacity-[0.14] sm:hidden [mask-image:linear-gradient(180deg,transparent,black_30%,black_70%,transparent)]"
-            >
-              <div className="absolute left-1/2 top-1/2 w-[220%] -translate-x-1/2 -translate-y-1/2 rotate-[4deg] overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
-                <motion.div
-                  className="flex w-max gap-2 py-3"
-                  animate={{ x: ['0%', '-50%'] }}
-                  transition={{ duration: 90, ease: 'linear', repeat: Infinity }}
-                >
-                  {[...MAP_KEYS, ...MAP_KEYS].map((m, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      key={`mt-${m}-${i}`}
-                      src={getMapBanner(m)}
-                      alt=""
-                      className="h-24 w-44 shrink-0 rounded-xl object-cover"
-                    />
-                  ))}
-                </motion.div>
-              </div>
-            </div>
-
-            {/* mobile-only: lower tilted window (drifts right, stronger) */}
-            <div
-              aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-[19rem] h-[11rem] overflow-hidden opacity-[0.20] sm:hidden [mask-image:linear-gradient(180deg,transparent,black_30%,black_70%,transparent)]"
-            >
-              <div className="absolute left-1/2 top-1/2 w-[220%] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]">
-                <motion.div
-                  className="flex w-max gap-2 py-3"
-                  animate={{ x: ['-50%', '0%'] }}
-                  transition={{ duration: 105, ease: 'linear', repeat: Infinity }}
-                >
-                  {[...MAP_KEYS].reverse().concat([...MAP_KEYS].reverse()).map((m, i) => (
-                    // eslint-disable-next-line @next/next/no-img-element
-                    <img
-                      key={`mb-${m}-${i}`}
-                      src={getMapBanner(m)}
-                      alt=""
-                      className="h-24 w-44 shrink-0 rounded-xl object-cover"
-                    />
-                  ))}
-                </motion.div>
-              </div>
-            </div>
-
+          {/* Hero art is desktop-only; phones get the clean blurred
+              backdrop so content stays readable. */}
+          <div className="relative w-full text-center">
             {/* desktop-only: back strip, higher band, slower drift right, gentle tilt */}
             <div
               aria-hidden

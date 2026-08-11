@@ -43,14 +43,15 @@ const FLOATING_MAPS = [
   { map: 'de_dust2', pos: 'right-[14%] top-[6%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
   { map: 'de_ancient', pos: 'right-[2%] top-[50%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
   { map: 'de_anubis', pos: 'right-[12%] top-[96%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
-  // mobile parenthesis — left edge
-  { map: 'de_mirage', pos: 'left-[1%] top-[-2%]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 6, delay: 0.2, hide: 'md:hidden' },
-  { map: 'de_inferno', pos: 'left-[0%] top-[40%]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 5.8, delay: 1.1, hide: 'md:hidden' },
-  { map: 'de_nuke', pos: 'left-[1%] top-[84%]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 7, delay: 0.5, hide: 'md:hidden' },
+  // mobile parenthesis — left edge, rem tops so the arc spans past the
+  // content-height hero without touching the centered text
+  { map: 'de_mirage', pos: 'left-[1%] top-[-0.5rem]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 6, delay: 0.2, hide: 'md:hidden' },
+  { map: 'de_inferno', pos: 'left-[0%] top-[3rem]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 5.8, delay: 1.1, hide: 'md:hidden' },
+  { map: 'de_nuke', pos: 'left-[1%] top-[8.5rem]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 7, delay: 0.5, hide: 'md:hidden' },
   // mobile parenthesis — right edge
-  { map: 'de_dust2', pos: 'right-[1%] top-[4%]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 6.5, delay: 0.7, hide: 'md:hidden' },
-  { map: 'de_ancient', pos: 'right-[0%] top-[46%]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 6.2, delay: 1.5, hide: 'md:hidden' },
-  { map: 'de_anubis', pos: 'right-[1%] top-[90%]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 7.2, delay: 1, hide: 'md:hidden' },
+  { map: 'de_dust2', pos: 'right-[1%] top-[0.5rem]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 6.5, delay: 0.7, hide: 'md:hidden' },
+  { map: 'de_ancient', pos: 'right-[0%] top-[4.5rem]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 6.2, delay: 1.5, hide: 'md:hidden' },
+  { map: 'de_anubis', pos: 'right-[1%] top-[10rem]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 7.2, delay: 1, hide: 'md:hidden' },
 ] as const;
 
 export default function Home() {
@@ -251,54 +252,57 @@ export default function Home() {
         </motion.div>
 
         <main className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-3 pb-16 pt-14 sm:px-4 sm:pt-20">
-          {/* Hero: map bands + parenthesis icon arcs.
-              Mobile: taller hero (min-h) so the art lives in the negative
-              space around the centered text — bands stay FLAT (rotation was
-              the clip source) and icons hug the extreme edges.
-              Desktop: angled counter-scrolling pair, unchanged. */}
-          <div className="relative flex min-h-[27rem] w-full flex-col items-center justify-center overflow-hidden text-center sm:min-h-0 sm:block sm:overflow-visible">
-            {/* mobile-only: flat upper band behind the headline, drifts left */}
+          {/* Hero: angled marquee bands + parenthesis icon arcs.
+              Art is pure background: absolutely positioned, self-clipping
+              windows (inset-x-0, fixed height) — it never reserves layout
+              space and never overflows the page. Desktop pair unchanged. */}
+          <div className="relative w-full text-center">
+            {/* mobile-only: upper angled window — behind the headline, drifts left */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-[2%] overflow-hidden opacity-[0.14] sm:hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]"
+              className="pointer-events-none absolute inset-x-0 top-[-1rem] h-48 overflow-hidden opacity-[0.15] sm:hidden [mask-image:linear-gradient(180deg,transparent,black_35%,black_65%,transparent)]"
             >
-              <motion.div
-                className="flex w-max gap-2 py-2"
-                animate={{ x: ['0%', '-50%'] }}
-                transition={{ duration: 90, ease: 'linear', repeat: Infinity }}
-              >
-                {[...MAP_KEYS, ...MAP_KEYS].map((m, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={`mt-${m}-${i}`}
-                    src={getMapBanner(m)}
-                    alt=""
-                    className="h-24 w-44 shrink-0 rounded-xl object-cover"
-                  />
-                ))}
-              </motion.div>
+              <div className="absolute left-1/2 top-1/2 w-[220%] -translate-x-1/2 -translate-y-1/2 rotate-[5deg] overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
+                <motion.div
+                  className="flex w-max gap-2 py-3"
+                  animate={{ x: ['0%', '-50%'] }}
+                  transition={{ duration: 90, ease: 'linear', repeat: Infinity }}
+                >
+                  {[...MAP_KEYS, ...MAP_KEYS].map((m, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={`mt-${m}-${i}`}
+                      src={getMapBanner(m)}
+                      alt=""
+                      className="h-24 w-44 shrink-0 rounded-xl object-cover"
+                    />
+                  ))}
+                </motion.div>
+              </div>
             </div>
 
-            {/* mobile-only: flat lower band in the open space, drifts right */}
+            {/* mobile-only: lower angled window — below the tagline, drifts right */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-[64%] overflow-hidden opacity-[0.20] sm:hidden [mask-image:linear-gradient(90deg,transparent,black_12%,black_88%,transparent)]"
+              className="pointer-events-none absolute inset-x-0 top-[7.5rem] h-48 overflow-hidden opacity-[0.20] sm:hidden [mask-image:linear-gradient(180deg,transparent,black_35%,black_65%,transparent)]"
             >
-              <motion.div
-                className="flex w-max gap-2 py-2"
-                animate={{ x: ['-50%', '0%'] }}
-                transition={{ duration: 105, ease: 'linear', repeat: Infinity }}
-              >
-                {[...MAP_KEYS].reverse().concat([...MAP_KEYS].reverse()).map((m, i) => (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    key={`mb-${m}-${i}`}
-                    src={getMapBanner(m)}
-                    alt=""
-                    className="h-24 w-44 shrink-0 rounded-xl object-cover"
-                  />
-                ))}
-              </motion.div>
+              <div className="absolute left-1/2 top-1/2 w-[220%] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
+                <motion.div
+                  className="flex w-max gap-2 py-3"
+                  animate={{ x: ['-50%', '0%'] }}
+                  transition={{ duration: 105, ease: 'linear', repeat: Infinity }}
+                >
+                  {[...MAP_KEYS].reverse().concat([...MAP_KEYS].reverse()).map((m, i) => (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      key={`mb-${m}-${i}`}
+                      src={getMapBanner(m)}
+                      alt=""
+                      className="h-24 w-44 shrink-0 rounded-xl object-cover"
+                    />
+                  ))}
+                </motion.div>
+              </div>
             </div>
 
             {/* desktop-only: back strip, higher band, slower drift right, gentle tilt */}

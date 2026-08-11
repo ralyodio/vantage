@@ -28,30 +28,17 @@ const MAP_KEYS = [
 ] as const;
 
 /**
- * Desktop (md+): 3 icons per side, arc-shaped with irregular spacing
- * so it reads scattered rather than a rigid ( ). Left leans (, right ).
- * Mobile (<md): same parenthesis idea but icons hug the extreme screen
- * edges (0-2% inset) inside the taller hero, so they never touch the
- * centered text — content keeps its layout, art fills the leftover.
+ * Parenthesis icon arcs framing the hero (desktop md+ only).
  */
 const FLOATING_MAPS = [
-  // desktop arcs — left side
+  // left side
   { map: 'de_mirage', pos: 'left-[12%] top-[-2%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 6, delay: 0, hide: 'hidden md:block' },
   { map: 'de_inferno', pos: 'left-[2%] top-[38%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 5.5, delay: 1.1, hide: 'hidden md:block' },
   { map: 'de_nuke', pos: 'left-[13%] top-[88%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 7, delay: 0.4, hide: 'hidden md:block' },
-  // desktop arcs — right side
+  // right side
   { map: 'de_dust2', pos: 'right-[14%] top-[6%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 6.5, delay: 0.6, hide: 'hidden md:block' },
   { map: 'de_ancient', pos: 'right-[2%] top-[50%]', size: 'h-14 w-14', opacity: 'opacity-85', duration: 6.2, delay: 1.6, hide: 'hidden md:block' },
   { map: 'de_anubis', pos: 'right-[12%] top-[96%]', size: 'h-10 w-10', opacity: 'opacity-80', duration: 7.2, delay: 0.9, hide: 'hidden md:block' },
-  // mobile parenthesis — left edge, rem tops so the arc spans past the
-  // content-height hero without touching the centered text
-  { map: 'de_mirage', pos: 'left-[1%] top-[-0.5rem]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 6, delay: 0.2, hide: 'md:hidden' },
-  { map: 'de_inferno', pos: 'left-[0%] top-[3rem]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 5.8, delay: 1.1, hide: 'md:hidden' },
-  { map: 'de_nuke', pos: 'left-[1%] top-[8.5rem]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 7, delay: 0.5, hide: 'md:hidden' },
-  // mobile parenthesis — right edge
-  { map: 'de_dust2', pos: 'right-[1%] top-[0.5rem]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 6.5, delay: 0.7, hide: 'md:hidden' },
-  { map: 'de_ancient', pos: 'right-[0%] top-[4.5rem]', size: 'h-10 w-10', opacity: 'opacity-75', duration: 6.2, delay: 1.5, hide: 'md:hidden' },
-  { map: 'de_anubis', pos: 'right-[1%] top-[10rem]', size: 'h-8 w-8', opacity: 'opacity-70', duration: 7.2, delay: 1, hide: 'md:hidden' },
 ] as const;
 
 export default function Home() {
@@ -405,25 +392,51 @@ export default function Home() {
           >
             <SearchBar onSearch={handleSearch} isLoading={isSearching} />
 
-            <div className="mt-4 flex flex-wrap items-center justify-center gap-2">
-              <span className="text-[11px] uppercase tracking-wide text-zinc-600">
+            {/* Try — mobile: 2x2 tappable cards; desktop: inline chips */}
+            <div className="mt-5">
+              <span className="mb-2 block text-[11px] uppercase tracking-wide text-zinc-600 sm:mb-0 sm:inline">
                 Try
               </span>
-              {examples.map((ex) => (
-                <button
-                  key={ex.kind}
-                  type="button"
-                  onClick={() => handleSearch(ex.query)}
-                  disabled={isSearching}
-                  title={`${ex.kind}: ${ex.query}`}
-                  className="group/chip inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-400 transition-colors duration-200 hover:border-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-40"
-                >
-                  {ex.label}
-                  <span className="rounded bg-black/40 px-1 py-px text-[9px] font-medium uppercase tracking-wide text-zinc-500 opacity-70 transition-opacity duration-200 group-hover/chip:opacity-100">
-                    {ex.kind}
-                  </span>
-                </button>
-              ))}
+
+              {/* mobile-only card grid */}
+              <div className="grid grid-cols-2 gap-2 sm:hidden">
+                {examples.map((ex) => (
+                  <button
+                    key={ex.kind}
+                    type="button"
+                    onClick={() => handleSearch(ex.query)}
+                    disabled={isSearching}
+                    title={`${ex.kind}: ${ex.query}`}
+                    className="flex min-h-[3.25rem] flex-col items-start justify-center gap-0.5 rounded-xl border border-white/[0.08] bg-black/45 px-3 py-2.5 text-left backdrop-blur-sm transition-colors duration-200 active:bg-black/60 disabled:pointer-events-none disabled:opacity-40"
+                  >
+                    <span className="w-full truncate text-xs font-medium text-zinc-200">
+                      {ex.label}
+                    </span>
+                    <span className="text-[9px] font-medium uppercase tracking-wide text-zinc-500">
+                      {ex.kind}
+                    </span>
+                  </button>
+                ))}
+              </div>
+
+              {/* desktop chips */}
+              <div className="hidden flex-wrap items-center justify-center gap-2 sm:flex">
+                {examples.map((ex) => (
+                  <button
+                    key={ex.kind}
+                    type="button"
+                    onClick={() => handleSearch(ex.query)}
+                    disabled={isSearching}
+                    title={`${ex.kind}: ${ex.query}`}
+                    className="group/chip inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.05] px-3 py-1.5 text-xs text-zinc-400 transition-colors duration-200 hover:border-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+                  >
+                    {ex.label}
+                    <span className="rounded bg-black/40 px-1 py-px text-[9px] font-medium uppercase tracking-wide text-zinc-500 opacity-70 transition-opacity duration-200 group-hover/chip:opacity-100">
+                      {ex.kind}
+                    </span>
+                  </button>
+                ))}
+              </div>
             </div>
           </motion.div>
 

@@ -247,7 +247,7 @@ export default function Home() {
             {/* mobile-only: upper angled window — behind the headline, drifts left */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-[-1rem] h-48 overflow-hidden opacity-[0.15] sm:hidden [mask-image:linear-gradient(180deg,transparent,black_35%,black_65%,transparent)]"
+              className="pointer-events-none absolute inset-x-0 top-[-3rem] h-48 overflow-hidden opacity-[0.15] sm:hidden [mask-image:linear-gradient(180deg,transparent,black_35%,black_65%,transparent)]"
             >
               <div className="absolute left-1/2 top-1/2 w-[220%] -translate-x-1/2 -translate-y-1/2 rotate-[5deg] overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
                 <motion.div
@@ -271,7 +271,7 @@ export default function Home() {
             {/* mobile-only: lower angled window — below the tagline, drifts right */}
             <div
               aria-hidden
-              className="pointer-events-none absolute inset-x-0 top-[7.5rem] h-48 overflow-hidden opacity-[0.20] sm:hidden [mask-image:linear-gradient(180deg,transparent,black_35%,black_65%,transparent)]"
+              className="pointer-events-none absolute inset-x-0 top-[5.5rem] h-48 overflow-hidden opacity-[0.20] sm:hidden [mask-image:linear-gradient(180deg,transparent,black_35%,black_65%,transparent)]"
             >
               <div className="absolute left-1/2 top-1/2 w-[220%] -translate-x-1/2 -translate-y-1/2 rotate-[-4deg] overflow-hidden [mask-image:linear-gradient(90deg,transparent,black_10%,black_90%,transparent)]">
                 <motion.div

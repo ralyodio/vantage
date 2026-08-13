@@ -393,13 +393,15 @@ export default function Home() {
             <SearchBar onSearch={handleSearch} isLoading={isSearching} />
 
             {/* Try — mobile: 2x2 tappable cards; desktop: inline chips */}
-            <div className="mt-5">
-              <span className="mb-2 block text-[11px] uppercase tracking-wide text-zinc-600 sm:mb-0 sm:inline">
-                Try
-              </span>
-
-              {/* mobile-only card grid */}
-              <div className="grid grid-cols-2 gap-2 sm:hidden">
+            {/* Try — desktop: centered inline chips (unchanged look).
+                Mobile: same chips, but single-column full-width rows so
+                long values (profile URLs) never wrap awkwardly. */}
+            <div className="mt-5 sm:mt-4">
+              {/* desktop */}
+              <div className="hidden flex-wrap items-center justify-center gap-2 sm:flex">
+                <span className="text-[11px] uppercase tracking-wide text-zinc-600">
+                  Try
+                </span>
                 {examples.map((ex) => (
                   <button
                     key={ex.kind}
@@ -407,20 +409,21 @@ export default function Home() {
                     onClick={() => handleSearch(ex.query)}
                     disabled={isSearching}
                     title={`${ex.kind}: ${ex.query}`}
-                    className="flex min-h-[3.25rem] flex-col items-start justify-center gap-0.5 rounded-xl border border-white/[0.08] bg-black/45 px-3 py-2.5 text-left backdrop-blur-sm transition-colors duration-200 active:bg-black/60 disabled:pointer-events-none disabled:opacity-40"
+                    className="group/chip inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-1.5 text-xs text-zinc-400 transition-colors duration-200 hover:border-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-40"
                   >
-                    <span className="w-full truncate text-xs font-medium text-zinc-200">
-                      {ex.label}
-                    </span>
-                    <span className="text-[9px] font-medium uppercase tracking-wide text-zinc-500">
+                    {ex.label}
+                    <span className="rounded bg-black/40 px-1 py-px text-[9px] font-medium uppercase tracking-wide text-zinc-500 opacity-70 transition-opacity duration-200 group-hover/chip:opacity-100">
                       {ex.kind}
                     </span>
                   </button>
                 ))}
               </div>
 
-              {/* desktop chips */}
-              <div className="hidden flex-wrap items-center justify-center gap-2 sm:flex">
+              {/* mobile — identical chip visual, stacked full-width */}
+              <div className="flex flex-col items-stretch gap-2 sm:hidden">
+                <span className="text-[11px] uppercase tracking-wide text-zinc-600">
+                  Try
+                </span>
                 {examples.map((ex) => (
                   <button
                     key={ex.kind}
@@ -428,10 +431,10 @@ export default function Home() {
                     onClick={() => handleSearch(ex.query)}
                     disabled={isSearching}
                     title={`${ex.kind}: ${ex.query}`}
-                    className="group/chip inline-flex items-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/[0.05] px-3 py-1.5 text-xs text-zinc-400 transition-colors duration-200 hover:border-white/20 hover:text-white disabled:pointer-events-none disabled:opacity-40"
+                    className="group/chip flex min-h-[2.75rem] items-center justify-between gap-2 rounded-lg border border-white/[0.08] bg-white/[0.03] px-3 py-2 text-xs text-zinc-400 transition-colors duration-200 active:bg-white/[0.07] disabled:pointer-events-none disabled:opacity-40"
                   >
-                    {ex.label}
-                    <span className="rounded bg-black/40 px-1 py-px text-[9px] font-medium uppercase tracking-wide text-zinc-500 opacity-70 transition-opacity duration-200 group-hover/chip:opacity-100">
+                    <span className="min-w-0 flex-1 truncate text-left">{ex.label}</span>
+                    <span className="shrink-0 rounded bg-black/40 px-1 py-px text-[9px] font-medium uppercase tracking-wide text-zinc-500">
                       {ex.kind}
                     </span>
                   </button>

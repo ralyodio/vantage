@@ -1,7 +1,8 @@
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
-import { HiArrowLeft, HiHome, HiRefresh } from 'react-icons/hi';
-import { RiAlertLine } from 'react-icons/ri';
+import { HiArrowSmLeft, HiRefresh } from 'react-icons/hi';
+
+const ease = [0.22, 1, 0.36, 1] as const;
 
 interface ErrorStateProps {
   title?: string;
@@ -12,127 +13,92 @@ interface ErrorStateProps {
 }
 
 export default function ErrorState({
-  title = 'Something Went Wrong',
-  message = 'An unexpected error occurred. Please try again.',
+  title = 'Lookup failed',
+  message = 'The profile could not be loaded. It may not exist, or a data source is unreachable.',
   errorCode,
   showRetry = true,
-  onRetry
+  onRetry,
 }: ErrorStateProps) {
   const router = useRouter();
 
   const handleRetry = () => {
-    if (onRetry) {
-      onRetry();
-    } else {
-      router.reload();
-    }
+    if (onRetry) onRetry();
+    else router.reload();
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center px-4 bg-background transition-colors relative overflow-hidden">
-      {/* Animated Background */}
-      <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(var(--destructive) 1px, transparent 1px), linear-gradient(90deg, var(--destructive) 1px, transparent 1px)',
-          backgroundSize: '50px 50px'
-        }} />
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#0a0a0b] px-4 text-zinc-100 antialiased">
+      {/* Blurred map backdrop */}
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="/maps/thumbs/de_train.png"
+          alt=""
+          className="absolute inset-0 h-full w-full scale-110 object-cover opacity-20 blur-3xl saturate-110"
+        />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0b]/75 via-[#0a0a0b]/88 to-[#0a0a0b]" />
       </div>
 
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="relative z-10 text-center max-w-2xl mx-auto"
+        transition={{ duration: 0.4, ease }}
+        className="relative z-10 flex w-full max-w-sm flex-col items-center text-center"
       >
-        {/* Icon */}
-        <motion.div
-          initial={{ scale: 0, rotate: -180 }}
-          animate={{ scale: 1, rotate: 0 }}
-          transition={{ delay: 0.2, type: "spring", stiffness: 150 }}
-          className="mb-6 sm:mb-8 inline-block"
-        >
-          <div className="relative">
-            <motion.div
-              animate={{ 
-                boxShadow: [
-                  '0 0 0 0 rgba(239, 68, 68, 0.2)',
-                  '0 0 0 20px rgba(239, 68, 68, 0)',
-                  '0 0 0 0 rgba(239, 68, 68, 0)'
-                ]
-              }}
-              transition={{ duration: 2, repeat: Infinity }}
-              className="w-24 h-24 sm:w-32 sm:h-32 mx-auto flex items-center justify-center rounded-full bg-destructive/10 border-2 border-destructive/40"
-            >
-              <RiAlertLine className="w-12 h-12 sm:w-16 sm:h-16 text-destructive" />
-            </motion.div>
-          </div>
-        </motion.div>
+        {/* Failed-scan frame */}
+        <div className="relative mb-8 flex h-24 w-24 items-center justify-center">
+          <span className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2 border-rose-400/60" />
+          <span className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2 border-rose-400/60" />
+          <span className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2 border-rose-400/60" />
+          <span className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-rose-400/60" />
+          <motion.span
+            aria-hidden
+            className="absolute inset-0 rounded-md bg-rose-400/[0.05]"
+            animate={{ opacity: [0.4, 0.9, 0.4] }}
+            transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+          />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/maps/icons/unknown.svg"
+            alt=""
+            className="h-12 w-12 object-contain opacity-40 grayscale drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
+          />
+        </div>
 
-        {/* Error Code (if provided) */}
         {errorCode && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mb-4 sm:mb-6"
-          >
-            <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter mb-2">
-              <span className="bg-gradient-to-r from-destructive via-destructive/80 to-destructive/60 bg-clip-text text-transparent">
-                {errorCode}
-              </span>
-            </h1>
-            <div className="h-[2px] w-32 sm:w-48 mx-auto bg-gradient-to-r from-transparent via-destructive/50 to-transparent" />
-          </motion.div>
+          <div className="mb-2 font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+            status: {String(errorCode).toLowerCase()}
+          </div>
         )}
 
-        {/* Message */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.4 }}
-          className="mb-6 sm:mb-8 space-y-3"
-        >
-          <h2 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wide">
-            {title}
-          </h2>
-          <p className="text-sm sm:text-base md:text-lg text-muted-foreground max-w-sm sm:max-w-md mx-auto">
-            {message}
-          </p>
-        </motion.div>
+        <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+          {title}
+          <span className="text-rose-400">.</span>
+        </h1>
+        <p className="mt-3 text-sm leading-relaxed text-zinc-400 sm:text-base">
+          {message}
+        </p>
 
-        {/* Actions */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4"
-        >
+        <div className="mt-8 flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
           {showRetry && (
             <button
+              type="button"
               onClick={handleRetry}
-              className="group px-4 sm:px-6 py-3 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg transition-all duration-300 inline-flex items-center gap-2 shadow-md hover:shadow-lg w-full sm:w-auto"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-white px-5 text-xs font-semibold text-zinc-900 transition-colors duration-200 hover:bg-zinc-100 active:scale-[0.98]"
             >
-              <HiRefresh className="w-4 h-4 sm:w-5 sm:h-5 group-hover:rotate-180 transition-transform duration-500" />
-              Try Again
+              <HiRefresh className="h-3.5 w-3.5" />
+              Retry
             </button>
           )}
-
           <button
-            onClick={() => router.back()}
-            className="group px-4 sm:px-6 py-3 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg transition-all duration-300 inline-flex items-center gap-2 shadow-md hover:shadow-lg w-full sm:w-auto"
-          >
-            <HiArrowLeft className="w-4 h-4 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
-            Go Back
-          </button>
-          
-          <button
+            type="button"
             onClick={() => router.push('/')}
-            className="group px-4 sm:px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all duration-300 inline-flex items-center gap-2 shadow-md hover:shadow-lg w-full sm:w-auto"
+            className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-xs font-medium text-zinc-300 transition-colors duration-200 hover:border-white/20 hover:text-white active:bg-white/[0.07]"
           >
-            <HiHome className="w-4 h-4 sm:w-5 sm:h-5 group-hover:scale-110 transition-transform" />
-            Go Home
+            <HiArrowSmLeft className="h-3.5 w-3.5" />
+            New search
           </button>
-        </motion.div>
+        </div>
       </motion.div>
     </div>
   );

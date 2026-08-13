@@ -1,9 +1,11 @@
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { HiArrowLeft, HiHome, HiRefresh } from 'react-icons/hi';
-import { RiAlertLine } from 'react-icons/ri';
+import { HiArrowSmLeft, HiHome, HiRefresh } from 'react-icons/hi';
 import type { NextPageContext } from 'next';
+import { LOGOS } from '../lib/map-assets';
+
+const ease = [0.22, 1, 0.36, 1] as const;
 
 interface ErrorProps {
   statusCode?: number;
@@ -13,138 +15,113 @@ interface ErrorProps {
 function Error({ statusCode, title }: ErrorProps) {
   const router = useRouter();
 
-  const errorTitle = title || (statusCode === 404 
-    ? 'Page Not Found' 
-    : statusCode === 500 
-      ? 'Internal Server Error' 
-      : 'An Error Occurred');
+  const errorTitle =
+    title ||
+    (statusCode === 404
+      ? 'No target at this location'
+      : statusCode === 500
+        ? 'Intel feed failure'
+        : 'Something went wrong');
 
   const errorMessage = statusCode === 404
-    ? "The page you're looking for doesn't exist or has been moved."
+    ? 'The page was moved or never existed.'
     : statusCode === 500
-      ? 'Something went wrong on our end. Please try again later.'
+      ? 'Something broke on our end. Try again in a moment.'
       : 'An unexpected error occurred. Please try again.';
 
-  const errorCode = statusCode || 'ERROR';
+  const errorCode = statusCode || 'ERR';
 
   return (
     <>
       <Head>
-        <title>{errorTitle} | Vantage</title>
+        <title>{errorCode} · Vantage</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </Head>
 
-      <div className="min-h-screen flex items-center justify-center px-4 bg-background transition-colors relative overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 opacity-[0.02] dark:opacity-[0.05]">
-          <div className="absolute inset-0" style={{
-            backgroundImage: 'linear-gradient(var(--destructive) 1px, transparent 1px), linear-gradient(90deg, var(--destructive) 1px, transparent 1px)',
-            backgroundSize: '50px 50px'
-          }} />
+      <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-[#0a0a0b] px-4 text-zinc-100 antialiased">
+        {/* Blurred map backdrop */}
+        <div className="pointer-events-none absolute inset-0" aria-hidden>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/maps/thumbs/de_inferno.png"
+            alt=""
+            className="absolute inset-0 h-full w-full scale-110 object-cover opacity-20 blur-3xl saturate-110"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0b]/75 via-[#0a0a0b]/88 to-[#0a0a0b]" />
         </div>
 
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="relative z-10 text-center max-w-2xl mx-auto"
+          transition={{ duration: 0.4, ease }}
+          className="relative z-10 flex w-full max-w-sm flex-col items-center text-center"
         >
-          {/* Icon */}
-          <motion.div
-            initial={{ scale: 0, rotate: -180 }}
-            animate={{ scale: 1, rotate: 0 }}
-            transition={{ delay: 0.2, type: "spring", stiffness: 150 }}
-            className="mb-8 inline-block"
-          >
-            <div className="relative">
-              <motion.div
-                animate={{ 
-                  boxShadow: [
-                    '0 0 0 0 rgba(239, 68, 68, 0.2)',
-                    '0 0 0 20px rgba(239, 68, 68, 0)',
-                    '0 0 0 0 rgba(239, 68, 68, 0)'
-                  ]
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-                className="w-32 h-32 mx-auto flex items-center justify-center rounded-full bg-destructive/10 border-2 border-destructive/40"
-              >
-                <RiAlertLine className="w-16 h-16 text-destructive" />
-              </motion.div>
-            </div>
-          </motion.div>
+          <span className="mb-10 flex h-7 items-center">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={LOGOS.brand} alt="Vantage" className="h-full w-auto object-contain" />
+          </span>
 
-          {/* Error Code */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.3 }}
-            className="mb-6"
-          >
-            <h1 className="text-7xl md:text-8xl font-bold tracking-tighter mb-2">
-              <span className="bg-gradient-to-r from-destructive via-destructive/80 to-destructive/60 bg-clip-text text-transparent">
-                {errorCode}
-              </span>
-            </h1>
-            <div className="h-[2px] w-48 mx-auto bg-gradient-to-r from-transparent via-destructive/50 to-transparent" />
-          </motion.div>
+          {/* Failed-scan frame */}
+          <div className="relative mb-8 flex h-24 w-24 items-center justify-center">
+            <span className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2 border-rose-400/60" />
+            <span className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2 border-rose-400/60" />
+            <span className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2 border-rose-400/60" />
+            <span className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2 border-rose-400/60" />
+            <motion.span
+              aria-hidden
+              className="absolute inset-0 rounded-md bg-rose-400/[0.05]"
+              animate={{ opacity: [0.4, 0.9, 0.4] }}
+              transition={{ duration: 2, repeat: Infinity, ease: 'easeInOut' }}
+            />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/maps/icons/unknown.svg"
+              alt=""
+              className="h-12 w-12 object-contain opacity-40 grayscale drop-shadow-[0_4px_16px_rgba(0,0,0,0.8)]"
+            />
+          </div>
 
-          {/* Message */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mb-8 space-y-3"
-          >
-            <h2 className="text-2xl md:text-3xl font-bold text-foreground uppercase tracking-wide">
-              {errorTitle}
-            </h2>
-            <p className="text-base md:text-lg text-muted-foreground max-w-md mx-auto">
-              {errorMessage}
-            </p>
-          </motion.div>
+          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl">
+            {errorCode}
+            <span className="text-rose-400">.</span>
+          </h1>
+          <p className="mt-3 text-sm text-zinc-400 sm:text-base">{errorTitle}</p>
+          <p className="mt-1 text-sm text-zinc-500">{errorMessage}</p>
 
-          {/* Actions */}
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
-            className="flex flex-col sm:flex-row items-center justify-center gap-4"
-          >
+          <div className="mt-6 flex w-full items-center gap-3">
+            <div className="h-px flex-1 bg-white/[0.06]" />
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-zinc-600">
+              status: {String(errorCode).toLowerCase()}
+            </span>
+            <div className="h-px flex-1 bg-white/[0.06]" />
+          </div>
+
+          <div className="mt-8 flex w-full flex-col gap-2 sm:flex-row sm:justify-center">
             <button
+              type="button"
               onClick={() => router.reload()}
-              className="group px-6 py-3 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg transition-all duration-300 inline-flex items-center gap-2 shadow-md hover:shadow-lg w-full sm:w-auto"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-xs font-medium text-zinc-300 transition-colors duration-200 hover:border-white/20 hover:text-white active:bg-white/[0.07]"
             >
-              <HiRefresh className="w-5 h-5 group-hover:rotate-180 transition-transform duration-500" />
-              Try Again
+              <HiRefresh className="h-3.5 w-3.5" />
+              Retry
             </button>
-
             <button
+              type="button"
               onClick={() => router.back()}
-              className="group px-6 py-3 bg-secondary hover:bg-secondary/80 text-secondary-foreground font-semibold rounded-lg transition-all duration-300 inline-flex items-center gap-2 shadow-md hover:shadow-lg w-full sm:w-auto"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl border border-white/[0.08] bg-white/[0.03] px-4 text-xs font-medium text-zinc-300 transition-colors duration-200 hover:border-white/20 hover:text-white active:bg-white/[0.07]"
             >
-              <HiArrowLeft className="w-5 h-5 group-hover:-translate-x-1 transition-transform" />
-              Go Back
+              <HiArrowSmLeft className="h-3.5 w-3.5" />
+              Go back
             </button>
-            
             <button
+              type="button"
               onClick={() => router.push('/')}
-              className="group px-6 py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-semibold rounded-lg transition-all duration-300 inline-flex items-center gap-2 shadow-md hover:shadow-lg w-full sm:w-auto"
+              className="inline-flex h-10 items-center justify-center gap-1.5 rounded-xl bg-white px-5 text-xs font-semibold text-zinc-900 transition-colors duration-200 hover:bg-zinc-100 active:scale-[0.98]"
             >
-              <HiHome className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              Go Home
+              <HiHome className="h-3.5 w-3.5" />
+              Home
             </button>
-          </motion.div>
-
-          {/* Additional Info */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.6 }}
-            className="mt-12 pt-8 border-t border-border/50"
-          >
-            <p className="text-xs text-muted-foreground/70 uppercase tracking-wider">
-              Status Code: {errorCode}
-            </p>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </>

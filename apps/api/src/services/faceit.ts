@@ -98,22 +98,38 @@ export class FaceitService {
               const matchStatsRes = await axios.get(`${FACEIT_API_BASE}/matches/${match.match_id}/stats`, {
                 headers: { Authorization: `Bearer ${FACEIT_API_KEY}` },
               });
-              
+
+              // Resolve SteamID64 + avatar per player from the history
+              // roster — no extra API calls.
+              const steamByPlayerId = new Map<string, string>();
+              const avatarByPlayerId = new Map<string, string>();
+              for (const faction of Object.values<any>(match.teams || {})) {
+                for (const p of faction?.players || []) {
+                  if (p?.player_id && p?.game_player_id) {
+                    steamByPlayerId.set(String(p.player_id), String(p.game_player_id));
+                  }
+                  if (p?.player_id && p?.avatar) {
+                    avatarByPlayerId.set(String(p.player_id), String(p.avatar));
+                  }
+                }
+              }
+
               // Find player's stats in the match
               let playerStats: any = null;
               const teams: any = { team1: null, team2: null };
               const mapName = extractFaceitMap(match, matchStatsRes.data);
-              
+
               for (const round of matchStatsRes.data.rounds || []) {
                 const team1Data = round.teams?.[0];
                 const team2Data = round.teams?.[1];
-                
+
                 // Process team 1
                 if (team1Data) {
                   const team1Players = team1Data.players?.map((p: any) => ({
                     playerId: p.player_id,
                     nickname: p.nickname,
-                    avatar: p.avatar,
+                    avatar: p.avatar || avatarByPlayerId.get(p.player_id),
+                    steam64: steamByPlayerId.get(p.player_id),
                     kills: parseInt(p.player_stats?.Kills || p.player_stats?.kills || '0'),
                     deaths: parseInt(p.player_stats?.Deaths || p.player_stats?.deaths || '0'),
                     assists: parseInt(p.player_stats?.Assists || p.player_stats?.assists || '0'),
@@ -146,7 +162,8 @@ export class FaceitService {
                   const team2Players = team2Data.players?.map((p: any) => ({
                     playerId: p.player_id,
                     nickname: p.nickname,
-                    avatar: p.avatar,
+                    avatar: p.avatar || avatarByPlayerId.get(p.player_id),
+                    steam64: steamByPlayerId.get(p.player_id),
                     kills: parseInt(p.player_stats?.Kills || p.player_stats?.kills || '0'),
                     deaths: parseInt(p.player_stats?.Deaths || p.player_stats?.deaths || '0'),
                     assists: parseInt(p.player_stats?.Assists || p.player_stats?.assists || '0'),

@@ -123,7 +123,7 @@ export default function ProfilePage() {
       <div className="min-h-screen bg-[#0a0a0b] text-zinc-100 antialiased">
         {/* Floating island navbar — full content width */}
         <div className="sticky top-0 z-40 pointer-events-none px-3 sm:px-4 pt-3 sm:pt-4">
-          <header className="pointer-events-auto mx-auto max-w-6xl flex items-center gap-2 sm:gap-3 h-12 sm:h-14 rounded-2xl border border-white/[0.08] bg-[#111113]/92 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.5)] px-2 sm:px-3">
+          <header className="pointer-events-auto relative mx-auto max-w-6xl flex items-center justify-between gap-2 sm:gap-3 h-12 sm:h-14 rounded-2xl border border-white/[0.08] bg-[#111113]/92 backdrop-blur-xl shadow-[0_8px_40px_rgba(0,0,0,0.5)] px-2 sm:px-3">
             <button
               type="button"
               onClick={() => router.push('/')}
@@ -139,12 +139,16 @@ export default function ProfilePage() {
               />
             </button>
 
+            {/* dead-center search — absolutely positioned at the navbar's
+                true midpoint, independent of the logo/buttons widths.
+                Width clamped so both sides always clear; action labels
+                expand at lg+ where there's room. */}
             <form
               onSubmit={handleNavSearch}
               role="search"
-              className="flex-1 min-w-0 max-w-md mx-auto"
+              className="pointer-events-none absolute left-1/2 top-1/2 w-[min(52vw,calc(100%-12rem),26rem)] -translate-x-1/2 -translate-y-1/2"
             >
-              <div className="flex items-center gap-2 h-9 rounded-xl bg-black/45 ring-1 ring-white/10 pl-3 pr-2 transition-shadow duration-200 focus-within:ring-white/25">
+              <div className="pointer-events-auto flex items-center gap-2 h-9 rounded-xl bg-black/45 ring-1 ring-white/10 pl-3 pr-2 transition-shadow duration-200 focus-within:ring-white/25">
                 <HiSearch className="w-3.5 h-3.5 shrink-0 text-zinc-500" />
                 <input
                   type="text"
@@ -165,14 +169,14 @@ export default function ProfilePage() {
                 onClick={handleRefreshMatches}
                 disabled={isRefreshingMatches}
                 title="Refresh match history"
-                className="inline-flex items-center justify-center gap-1.5 h-9 w-9 sm:w-[7.25rem] rounded-xl border border-white/[0.08] bg-white/[0.03] px-0 sm:px-3 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] hover:border-white/15 transition-colors duration-200 disabled:opacity-40 disabled:pointer-events-none"
+                className="inline-flex items-center justify-center gap-1.5 h-9 w-9 lg:w-[7.25rem] rounded-xl border border-white/[0.08] bg-white/[0.03] px-0 lg:px-3 text-xs font-medium text-zinc-300 hover:text-white hover:bg-white/[0.06] hover:border-white/15 transition-colors duration-200 disabled:opacity-40 disabled:pointer-events-none"
               >
                 <HiOutlineCollection
                   className={`w-3.5 h-3.5 shrink-0 ${
                     isRefreshingMatches ? 'animate-pulse' : ''
                   }`}
                 />
-                <span className="hidden sm:inline w-[4.5rem] text-center">
+                <span className="hidden lg:inline w-[4.5rem] text-center">
                   {isRefreshingMatches ? 'Updating…' : 'Matches'}
                 </span>
               </button>
@@ -182,14 +186,14 @@ export default function ProfilePage() {
                 onClick={handleRefresh}
                 disabled={isRefreshing}
                 title="Refresh full profile"
-                className="inline-flex items-center justify-center gap-1.5 h-9 w-9 sm:w-[7.75rem] rounded-xl bg-white text-zinc-900 px-0 sm:px-3 text-xs font-semibold hover:bg-zinc-100 active:scale-[0.98] transition-colors duration-200 disabled:opacity-40 disabled:pointer-events-none"
+                className="inline-flex items-center justify-center gap-1.5 h-9 w-9 lg:w-[7.75rem] rounded-xl bg-white text-zinc-900 px-0 lg:px-3 text-xs font-semibold hover:bg-zinc-100 active:scale-[0.98] transition-colors duration-200 disabled:opacity-40 disabled:pointer-events-none"
               >
                 <HiRefresh
                   className={`w-3.5 h-3.5 shrink-0 ${
                     isRefreshing ? 'animate-spin' : ''
                   }`}
                 />
-                <span className="hidden sm:inline w-[5rem] text-center">
+                <span className="hidden lg:inline w-[5rem] text-center">
                   {isRefreshing ? 'Refreshing…' : 'Refresh'}
                 </span>
               </button>

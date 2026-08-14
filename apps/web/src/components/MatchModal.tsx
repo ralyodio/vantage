@@ -511,23 +511,23 @@ function TeamBlock({
                     }`}
                   >
                     <div className="flex min-w-0 items-center gap-2">
-                      {av ? (
-                        <img
-                          src={av}
-                          alt=""
-                          className={`h-6 w-6 shrink-0 rounded object-cover bg-zinc-800 ${
-                            you ? 'ring-1 ring-white/25' : ''
-                          }`}
-                        />
-                      ) : (
-                        <div
-                          className={`flex h-6 w-6 shrink-0 items-center justify-center rounded bg-zinc-800 text-[10px] font-bold text-zinc-500 ${
-                            you ? 'ring-1 ring-white/25' : ''
-                          }`}
-                        >
-                          {p.name.charAt(0).toUpperCase()}
-                        </div>
-                      )}
+                      <div
+                        className={`relative flex h-6 w-6 shrink-0 items-center justify-center overflow-hidden rounded bg-zinc-800 text-[10px] font-bold text-zinc-500 ${
+                          you ? 'ring-1 ring-white/25' : ''
+                        }`}
+                      >
+                        <span aria-hidden>{p.name.charAt(0).toUpperCase()}</span>
+                        {av && (
+                          <img
+                            src={av}
+                            alt=""
+                            className="absolute inset-0 h-full w-full object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).style.display = 'none';
+                            }}
+                          />
+                        )}
+                      </div>
                       {p.steam64 ? (
                         <a
                           href={`/profile/${p.steam64}`}

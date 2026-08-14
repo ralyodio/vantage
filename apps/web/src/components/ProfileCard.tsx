@@ -4,8 +4,6 @@ import Image from 'next/image';
 import { HiOutlineExternalLink } from 'react-icons/hi';
 import type { UserProfile } from '@vantage/shared';
 import {
-  getSteamLevelColor,
-  getSteamLevelGlow,
   getSteamLevelStyle,
   parseSteamLevelClass,
 } from '@vantage/shared';
@@ -27,8 +25,6 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
 
   const levelFromClass = parseSteamLevelClass(steam.levelClass);
   const levelForColor = steam.level ?? levelFromClass;
-  const levelColor = getSteamLevelColor(levelForColor);
-  const levelGlow = getSteamLevelGlow(levelForColor);
   const levelStyle = getSteamLevelStyle(levelForColor);
 
   const bg = steam.profileBackground;
@@ -118,8 +114,8 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
           {/*
             Avatar stack:
             - Square avatar (Steam profile style)
-            - Equipped frame PNG when present
-            - Level-colored border only when no frame
+            - Equipped frame PNG when present; otherwise a plain avatar
+              with no ring or border decoration
           */}
           <div className="relative shrink-0 w-[96px] h-[96px] sm:w-[148px] sm:h-[148px]">
             {steam.avatarFrame ? (
@@ -147,30 +143,22 @@ export default function ProfileCard({ profile }: { profile: UserProfile }) {
               </>
             ) : (
               <div
-                className="absolute inset-0 rounded-lg p-[3px]"
-                style={{
-                  background: banned
-                    ? 'linear-gradient(135deg, #ef4444, #991b1b)'
-                    : `linear-gradient(135deg, ${levelColor}, ${levelColor}99)`,
-                  boxShadow: banned
-                    ? '0 0 14px rgba(239,68,68,0.4)'
-                    : `0 0 14px ${levelGlow}`,
-                }}
+                className={`absolute inset-0 rounded-md overflow-hidden bg-zinc-900 ${
+                  banned ? 'ring-2 ring-red-500' : ''
+                }`}
               >
-                <div className="relative h-full w-full rounded-[6px] overflow-hidden bg-zinc-900">
-                  {steam.avatar ? (
-                    <Image
-                      src={steam.avatar}
-                      alt={steam.username}
-                      fill
-                      className="object-cover"
-                      sizes="148px"
-                      priority
-                    />
-                  ) : (
-                    <div className="w-full h-full bg-zinc-800" />
-                  )}
-                </div>
+                {steam.avatar ? (
+                  <Image
+                    src={steam.avatar}
+                    alt={steam.username}
+                    fill
+                    className="object-cover"
+                    sizes="148px"
+                    priority
+                  />
+                ) : (
+                  <div className="w-full h-full bg-zinc-800" />
+                )}
               </div>
             )}
 

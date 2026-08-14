@@ -211,6 +211,8 @@ export interface MatchPlayer {
   playerId: string;
   nickname: string;
   avatar?: string;
+  /** SteamID64, resolved from the FACEIT history roster */
+  steam64?: string;
   kills: number;
   deaths: number;
   assists: number;

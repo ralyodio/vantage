@@ -366,7 +366,7 @@ function SideLabel({
   team?: Team;
   align: 'left' | 'right';
 }) {
-  if (!team) return <div className="w-[4.5rem] sm:w-24" />;
+  if (!team) return <div className="w-[4.5rem] sm:w-40" />;
   const color =
     team.side === 'ct'
       ? 'text-sky-300'
@@ -375,10 +375,13 @@ function SideLabel({
         : 'text-zinc-300';
 
   const icon = sideIcon(team.side);
+  // short form for the narrow mobile score strip; full name from sm up
+  const short =
+    team.side === 'ct' ? 'CT' : team.side === 't' ? 'T' : team.name;
 
   return (
     <div
-      className={`w-[4.5rem] min-w-0 sm:w-28 ${
+      className={`w-[4.5rem] min-w-0 sm:w-40 ${
         align === 'right' ? 'text-right' : 'text-left'
       }`}
     >
@@ -388,7 +391,8 @@ function SideLabel({
         }`}
       >
         {icon && <img src={icon} alt="" className="h-4 w-4 shrink-0" />}
-        {team.name}
+        <span className="sm:hidden">{short}</span>
+        <span className="hidden sm:inline">{team.name}</span>
       </div>
       <div className="mt-0.5 text-[10px] font-semibold uppercase tracking-wide">
         {team.won ? (
@@ -635,7 +639,7 @@ function fromFaceit(match: MatchStats): Team[] {
           id: p.playerId || `f${i}`,
           name: p.nickname || 'Unknown',
           avatar: p.avatar,
-          steam64: undefined,
+          steam64: p.steam64,
           k,
           d,
           a,
@@ -729,7 +733,13 @@ function fromLeetify(match: any): Team[] {
     const side: Team['side'] =
       teamNum === 2 ? 'ct' : teamNum === 3 ? 't' : 'neutral';
     const name =
-      side === 'ct' ? 'CT' : side === 't' ? 'T' : idx === 0 ? 'Team A' : 'Team B';
+      side === 'ct'
+        ? 'Counter-Terrorist'
+        : side === 't'
+          ? 'Terrorist'
+          : idx === 0
+            ? 'Team A'
+            : 'Team B';
 
     return {
       name,

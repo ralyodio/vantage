@@ -191,6 +191,16 @@ export default function Home() {
       <Head>
         <title>Vantage · CS2 Intelligence Platform</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta name="description" content="Threat scores, Premier ranks and match forensics for any CS2 player. Steam, FACEIT and Leetify merged into one report." />
+        <meta property="og:type" content="website" />
+        <meta property="og:site_name" content="Vantage" />
+        <meta property="og:title" content="Vantage · See what they're hiding." />
+        <meta property="og:description" content="CS2 intelligence: threat scores, Premier ranks and match forensics for any player. Steam + FACEIT + Leetify in one search." />
+        <meta property="og:image" content="/og.png" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="Vantage · See what they're hiding." />
+        <meta name="twitter:description" content="CS2 intelligence: threat scores, Premier ranks and match forensics." />
+        <meta name="twitter:image" content="/og.png" />
       </Head>
 
       <div className="relative flex min-h-screen flex-col bg-[#0a0a0b] text-zinc-100 antialiased">

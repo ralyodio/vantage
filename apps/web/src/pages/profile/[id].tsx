@@ -118,6 +118,20 @@ export default function ProfilePage() {
       <Head>
         <title>{profile.steam.username} · Vantage</title>
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+        <meta property="og:type" content="profile" />
+        <meta property="og:site_name" content="Vantage" />
+        <meta
+          property="og:title"
+          content={`${profile.steam.username} · threat ${profile.risk.totalScore}/100`}
+        />
+        <meta
+          property="og:description"
+          content={`${profile.faceit ? `FACEIT ${profile.faceit.elo} · ` : ''}${profile.steam.yearsOfService ?? 0}y on Steam · see the full threat report, Premier rank and match history.`}
+        />
+        {profile.steam.avatar && (
+          <meta property="og:image" content={profile.steam.avatar} />
+        )}
+        <meta name="twitter:card" content="summary" />
       </Head>
 
       <div className="min-h-screen bg-[#0a0a0b] text-zinc-100 antialiased">

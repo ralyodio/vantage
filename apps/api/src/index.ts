@@ -27,21 +27,39 @@ if (process.env.LEETIFY_API_KEY) {
   console.log('LEETIFY_API_KEY loaded');
 }
 
+// Pretty logs in dev, structured JSON in production (Fly ingests both).
+const isProd = process.env.NODE_ENV === 'production';
+
 const server = Fastify({
-  logger: {
-    transport: {
-      target: 'pino-pretty',
-      options: {
-        translateTime: 'HH:MM:ss Z',
-        ignore: 'pid,hostname',
+  logger: isProd
+    ? { level: process.env.LOG_LEVEL || 'info' }
+    : {
+        transport: {
+          target: 'pino-pretty',
+          options: {
+            translateTime: 'HH:MM:ss Z',
+            ignore: 'pid,hostname',
+          },
+        },
       },
-    },
-  },
 });
 
-// Register plugins
+// Register plugins.
+// CORS_ORIGIN locks browser access in production (comma-separated list);
+// the Vercel proxy talks server-to-server and needs no CORS at all.
+// Unset keeps permissive behavior for local development.
+const corsOrigins = (process.env.CORS_ORIGIN || '')
+  .split(',')
+  .map((o) => o.trim())
+  .filter(Boolean);
+
 server.register(cors, {
-  origin: true, // Allow all origins in development
+  origin: corsOrigins.length
+    ? (origin, cb) => {
+        if (!origin || corsOrigins.includes(origin)) cb(null, true);
+        else cb(new Error('Origin not allowed'), false);
+      }
+    : true,
 });
 
 // Register routes

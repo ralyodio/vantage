@@ -1,12 +1,18 @@
 import Redis from 'ioredis';
 import type { UserProfile } from '@vantage/shared';
 
-const redis = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
-  password: process.env.REDIS_PASSWORD || undefined,
-  maxRetriesPerRequest: 3,
-});
+// REDIS_URL wins (rediss:// scheme enables TLS automatically for Upstash);
+// falls back to discrete host/port for local docker-compose.
+const redis = process.env.REDIS_URL
+  ? new Redis(process.env.REDIS_URL, {
+      maxRetriesPerRequest: 3,
+    })
+  : new Redis({
+      host: process.env.REDIS_HOST || 'localhost',
+      port: parseInt(process.env.REDIS_PORT || '6379'),
+      password: process.env.REDIS_PASSWORD || undefined,
+      maxRetriesPerRequest: 3,
+    });
 
 const CACHE_TTL = 604800; // 7 days (604800 seconds)
 

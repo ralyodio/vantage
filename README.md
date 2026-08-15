@@ -163,7 +163,6 @@ Complete reference with response shapes and caching behavior:
 ## Documentation
 
 - [QUICKSTART.md](QUICKSTART.md) - setup, commands, troubleshooting
-- [docs/DEPLOY.md](docs/DEPLOY.md) - production deploy (Vercel + Fly + Neon + Upstash)
 - [docs/api.md](docs/api.md) - REST reference
 - [docs/risk-assessment.md](docs/risk-assessment.md) - threat model v2
 - [docs/examples-sdks.md](docs/examples-sdks.md) - client examples

@@ -1,8 +1,10 @@
-# Production Deployment
+# Optional: Hosted Deployment
 
-Four managed services, all with free tiers: **Vercel** (web),
-**Fly.io** (API), **Neon** (PostgreSQL), **Upstash** (Redis). Total cost
-at launch scale: **$0–5/month**. End state:
+Vantage is a self-hosted project — clone it, add keys, `npm run dev` (see
+[QUICKSTART](../QUICKSTART.md)). This runbook is **only** for anyone who
+wants to run it as a public instance. Four managed services, all with
+free tiers: **Vercel** (web), **Fly.io** (API), **Neon** (PostgreSQL),
+**Upstash** (Redis). Total cost at small scale: **$0–5/month**. End state:
 
 ```
 Browser ─▶ Vercel (Next.js, /api proxy injects keys)
@@ -14,8 +16,8 @@ Browser ─▶ Vercel (Next.js, /api proxy injects keys)
               └─▶ Steam / FACEIT / Leetify
 ```
 
-> **Do not** post the Reddit launch link until the smoke tests at the end
-> pass. The stack is rate-limit-first; verify it holds before traffic.
+> If you do open an instance to the public, pass the smoke tests at the
+> end first. The stack is rate-limit-first; verify it holds before traffic.
 
 ---
 

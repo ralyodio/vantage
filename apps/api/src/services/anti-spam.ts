@@ -98,12 +98,11 @@ export class AntiSpamService {
       score += 10;
     }
 
-    // Check for missing or suspicious referer
-    const referer = request.headers['referer'] || request.headers['referrer'];
-    if (!referer) {
-      reasons.push('Missing referer header');
-      score += 15;
-    }
+    // Note: referer is deliberately NOT scored. Browsers always send it,
+    // but legitimate API clients (curl, SDKs) never do — gating on it
+    // captcha-locks every programmatic consumer in production. Suspicious
+    // user agents alone (+30) still trip the threshold, and the Redis
+    // rate limiter remains the primary protection for everything else.
 
     // Check request frequency patterns (would need historical data)
     // For now, we'll use a simple scoring system

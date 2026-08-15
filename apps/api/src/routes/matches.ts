@@ -8,12 +8,35 @@ const leetifyService = new LeetifyService();
 const steamService = new SteamService();
 const cacheService = new CacheService();
 
+/**
+ * Leetify v3 history returns data_source names like "matchmaking_wingman"
+ * or "matchmaking_competitive", but the v2 match endpoint serves all
+ * Valve demo types under "matchmaking". Verified live for premier,
+ * wingman, and competitive.
+ */
+const DATA_SOURCE_ALIASES: Record<string, string> = {
+  premier: 'premier',
+  faceit: 'faceit',
+  esea: 'esea',
+};
+
+function normalizeDataSource(source: string): string {
+  const key = source.trim().toLowerCase();
+  if (DATA_SOURCE_ALIASES[key]) return DATA_SOURCE_ALIASES[key];
+  // every matchmaking_* variant (and "matchmaking" itself) resolves to "matchmaking"
+  if (key === 'matchmaking' || key.startsWith('matchmaking_')) {
+    return 'matchmaking';
+  }
+  return key;
+}
+
 export async function matchesRoutes(fastify: FastifyInstance) {
   // Get full match details by data source and ID
   fastify.get<{
     Params: { dataSource: string; dataSourceId: string };
   }>('/matches/:dataSource/:dataSourceId', async (request, reply) => {
-    const { dataSource, dataSourceId } = request.params;
+    const { dataSourceId } = request.params;
+    const dataSource = normalizeDataSource(request.params.dataSource);
     const cacheKey = `match:${dataSource}:${dataSourceId}`;
 
     // Extract API keys from headers

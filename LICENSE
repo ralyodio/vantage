@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Vantage
+Copyright (c) 2026 Vantage contributors
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -22,13 +22,45 @@ SOFTWARE.
 
 ---
 
-THIRD-PARTY API TERMS:
+THIRD-PARTY DATA AND TERMS
 
-This software integrates with third-party APIs which have their own terms:
+This software queries third-party APIs. Operators are responsible for
+complying with each provider's terms:
 
 - Steam Web API: https://steamcommunity.com/dev/apiterms
-- Faceit API: https://developers.faceit.com/terms
-- Leetify API: Contact Leetify for terms
+- FACEIT Data API: https://developers.faceit.com/terms
+- Leetify API: https://leetify.com/blog/leetify-api-developer-guidelines/
+  (display the "Data Provided by Leetify" attribution when using Leetify data;
+   never modify Leetify logos)
 
-Users of this software are responsible for complying with all applicable
-third-party terms of service.
+THIRD-PARTY ASSETS AND TRADEMARKS
+
+The repository bundles artwork and trademarks owned by third parties for
+interoperability and identification only. This project is not affiliated
+with, endorsed by, or sponsored by any of them:
+
+- Counter-Strike 2, its map artwork (icons, radar-derived thumbnails),
+  Premier rating banners, and the CT/T faction icons are property of
+  Valve Corporation. Map art in apps/web/public/maps is derived from
+  community depot mirrors (MurkyYT/cs2-map-icons) and the banner bases
+  from community game-file extracts (Juknum/counter-strike-icons).
+- The FACEIT name, logo, and skill level badges are property of FACEIT
+  Ltd. Level badges in apps/web/public/logos/faceit-levels are sourced
+  from FACEIT's CDN.
+- The Leetify name and logos are property of Leetify AB. Marks in
+  apps/web/public/logos are sourced from leetify.com and are used under
+  their published API attribution guidelines.
+- The Steam name and logo are property of Valve Corporation.
+- Country flags in apps/web/public/flags are from flagcdn.com (public
+  domain).
+
+If you are a rights holder and believe an asset is used incorrectly,
+please open an issue and it will be addressed promptly.
+
+USAGE NOTES
+
+- Vantage computes an automated "threat score" from public data. It is a
+  heuristic opinion, not a VAC verdict or proof of cheating. Do not
+  present it as one.
+- Only publicly accessible profile data is queried. Respect the rate
+  limits of every upstream provider.

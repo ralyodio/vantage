@@ -1,185 +1,113 @@
-# Quick Start Guide
+# Quickstart
 
-## Initial Setup (First Time Only)
+## 1. Requirements
+
+- Node.js 18+
+- Docker (PostgreSQL 16 + Redis 7 run in compose)
+- A Steam Web API key (FACEIT and Leetify optional but recommended)
+
+## 2. Setup
 
 ```bash
-# 1. Navigate to project
-cd /Users/drwn/Documents/Projects/vantage
-
-# 2. Run automated setup
 ./setup.sh
 ```
 
-**Or manually:**
+Manual equivalent:
 
 ```bash
-# Copy environment template
 cp .env.example .env
-
-# Start Docker services
-npm run docker:up
-
-# Setup database
-npm run db:generate
-npm run db:push
+npm install
+npm run docker:up     # PostgreSQL + Redis
+npm run db:generate   # Prisma client
+npm run db:push       # schema
 ```
 
-## Configure API Keys
+## 3. Keys
 
-Edit `.env` file:
+Add to `.env`:
 
 ```env
-STEAM_API_KEY="YOUR_STEAM_KEY_HERE"
-FACEIT_API_KEY="YOUR_FACEIT_KEY_HERE"
-LEETIFY_API_KEY="YOUR_LEETIFY_KEY_HERE"  # Optional
+STEAM_API_KEY="..."     # https://steamcommunity.com/dev/apikey
+FACEIT_API_KEY="..."    # https://developers.faceit.com/   (optional)
+LEETIFY_API_KEY="..."   # contact Leetify                  (optional)
 ```
 
-### Getting API Keys
+Keys are read server-side only; the Next.js proxy injects them when calling
+the backend. Never prefix them with `NEXT_PUBLIC_`.
 
-1. **Steam**: https://steamcommunity.com/dev/apikey
-2. **Faceit**: https://developers.faceit.com/
-3. **Leetify**: Contact their team
-
-## Start Development
+## 4. Run
 
 ```bash
-# Start everything (recommended)
-npm run dev
-
-# Or start individually:
-npm run dev:web    # Frontend only (port 3000)
-npm run dev:api    # Backend only (port 3001)
-npm run worker     # Background jobs
+npm run dev            # API + web together
+npm run dev:api        # backend only, http://localhost:3001
+npm run dev:web        # frontend only, http://localhost:3000
+npm run worker         # optional BullMQ background worker
 ```
 
-## Access Points
+## 5. Try it
 
-- **Frontend**: http://localhost:3000
-- **API**: http://localhost:3001/health
-- **Database UI**: `npm run db:studio`
+Open http://localhost:3000 and search any of:
 
-## Test the Platform
+- `aebu` (vanity)
+- `https://steamcommunity.com/id/aebu` (profile URL)
+- `76561199548276875` (SteamID64)
+- `STEAM_0:1:79400573` (SteamID32)
 
-Try searching for:
-- Your Steam profile URL
-- `76561198012345678` (SteamID64 format)
-- `s1mple` (pro player vanity name)
+Then open any match in the history for the full scoreboard.
 
-## Common Commands
+## Commands
 
-```bash
-# Development
-npm run dev              # Start all services
-npm run dev:web          # Frontend only
-npm run dev:api          # Backend only
-npm run worker           # BullMQ worker
+| Command | What it does |
+|---------|--------------|
+| `npm run dev` | Run API + web with hot reload |
+| `npm run build` / `build:web` / `build:api` | Production builds |
+| `npm run worker` | BullMQ background jobs |
+| `npm run db:studio` | Prisma Studio database UI |
+| `npm run docker:up` / `docker:down` | Start/stop PostgreSQL + Redis |
+| `node scripts/fetch-map-assets.mjs` | Refresh local map artwork |
+| `node scripts/take-screenshots.cjs` | Regenerate the README gallery |
 
-# Database
-npm run db:generate      # Generate Prisma client
-npm run db:push          # Push schema changes
-npm run db:studio        # Open database UI
+## Stopping everything
 
-# Docker
-npm run docker:up        # Start PostgreSQL + Redis
-npm run docker:down      # Stop services
-docker-compose logs -f   # View logs
-
-# Production
-npm run build            # Build all
-npm run build:web        # Build frontend
-npm run build:api        # Build backend
-```
+`Ctrl+C` kills the dev servers (or `pkill -f vantage/node_modules/.bin/concurrently`
+if detached), then `npm run docker:down`.
 
 ## Troubleshooting
 
-### Docker not running
-```bash
-# macOS: Start Docker Desktop
-open -a Docker
+**Port in use**
 
-# Verify Docker is running
-docker info
+```bash
+lsof -ti:3000 | xargs kill -9    # or 3001
 ```
 
-### Port already in use
-```bash
-# Kill process on port 3000
-lsof -ti:3000 | xargs kill -9
+**Database / Redis errors**
 
-# Kill process on port 3001
-lsof -ti:3001 | xargs kill -9
+```bash
+docker-compose ps              # both healthy?
+docker-compose restart postgres redis
+npm run db:push
 ```
 
-### Database connection error
-```bash
-# Restart PostgreSQL
-docker-compose restart postgres
+**"STEAM_API_KEY required"** - key missing in `.env`, or restart `dev:api`
+after editing it.
 
-# Check if running
-docker-compose ps
-```
+**Profile looks stale** - hit Refresh (10 min cooldown) or flush the cache:
+`docker exec vantage-redis redis-cli del "profile:<steam64>"`.
 
-### Redis connection error
-```bash
-# Restart Redis
-docker-compose restart redis
+**FACEIT scoreboards show one player** - stale cache from before the source
+alias fix; flush as above or Refresh All.
 
-# Test connection
-redis-cli ping
-# Should return: PONG
-```
+## Where things live
 
-### Prisma errors
-```bash
-# Regenerate client
-npm run db:generate
+| Path | Contents |
+|------|----------|
+| `apps/web/src/pages` | Home, profile, 404, API proxies |
+| `apps/web/src/components` | UI (profile card, match cards, scoreboard modal, risk meter...) |
+| `apps/web/src/lib/map-assets.ts` | Map/flag/logo/premier helpers |
+| `apps/web/public` | Maps, logos, premier banners, country flags |
+| `apps/api/src/routes` | Profile + matches endpoints |
+| `apps/api/src/services` | Steam (cosmetics incl.), FACEIT, Leetify, cache |
+| `packages/shared/src` | Types, Steam resolver, threat calculator |
+| `prisma/schema.prisma` | Database schema |
 
-# Reset database (WARNING: deletes all data)
-npx prisma migrate reset
-```
-
-## Development Workflow
-
-1. **Make changes** to code
-2. **Hot reload** automatically updates
-3. **Check errors** in terminal
-4. **Test** in browser
-5. **Commit** changes
-
-## File Locations
-
-**Frontend**:
-- Pages: `apps/web/src/pages/`
-- Components: `apps/web/src/components/`
-- Styles: `apps/web/src/styles/`
-
-**Backend**:
-- Routes: `apps/api/src/routes/`
-- Services: `apps/api/src/services/`
-
-**Shared**:
-- Types: `packages/shared/src/types.ts`
-- Risk Logic: `packages/shared/src/risk-calculator.ts`
-
-**Database**:
-- Schema: `prisma/schema.prisma`
-
-## Next Steps
-
-1. Set up API keys in `.env`
-2. Start development servers
-3. Test with real Steam profiles
-4. Customize risk weights in `risk-calculator.ts`
-5. Adjust UI colors in `tailwind.config.js`
-6. Add more data sources
-7. Deploy to production
-
-## Resources
-
-- [Main README](./README.md)
-- [Architecture Overview](./ARCHITECTURE.md)
-- [Development Notes](./DEVELOPMENT.md)
-
----
-
-**Need help?** Check the troubleshooting section in README.md
+Next: [README](README.md) · [API docs](docs/api.md)

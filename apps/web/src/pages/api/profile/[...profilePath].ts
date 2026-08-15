@@ -55,7 +55,13 @@ export default async function handler(
       const response = await axios.get(fullUrl, { headers });
       return res.status(response.status).json(response.data);
     } else if (req.method === 'POST') {
-      const response = await axios.post(fullUrl, req.body, { headers });
+      // Always JSON — empty refresh POSTs otherwise arrive as form-urlencoded and Fastify 415s
+      headers['Content-Type'] = 'application/json';
+      const body =
+        req.body && typeof req.body === 'object' && !Array.isArray(req.body)
+          ? req.body
+          : {};
+      const response = await axios.post(fullUrl, body, { headers });
       return res.status(response.status).json(response.data);
     } else {
       return res.status(405).json({

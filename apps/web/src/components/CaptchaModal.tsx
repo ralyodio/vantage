@@ -121,29 +121,30 @@ export default function CaptchaModal({
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             className="fixed inset-4 md:inset-8 lg:inset-16 flex items-center justify-center z-[101]"
           >
-            <div className="bg-card border border-border rounded-lg shadow-2xl max-w-md w-full mx-4 p-6">
+            <div className="rounded-2xl border border-white/[0.08] bg-[#111113]/95 shadow-[0_8px_40px_rgba(0,0,0,0.5)] backdrop-blur-xl max-w-md w-full mx-4 p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
               {/* Header */}
               <div className="flex items-center justify-between mb-6">
-                <div className="flex items-center gap-3">
-                  <HiShieldCheck className="w-6 h-6 text-primary" />
-                  <h2 className="text-xl font-bold text-primary">
-                    Verification Required
+                <div className="flex items-center gap-2">
+                  <HiShieldCheck className="w-4 h-4 text-emerald-400" />
+                  <h2 className="text-xs font-semibold uppercase tracking-[0.14em] text-zinc-300">
+                    Verification required
                   </h2>
                 </div>
                 <button
                   onClick={handleClose}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="rounded-lg p-1.5 text-zinc-500 transition-colors duration-200 hover:bg-white/[0.05] hover:text-white"
+                  aria-label="Close"
                 >
-                  <HiX className="w-5 h-5" />
+                  <HiX className="w-4 h-4" />
                 </button>
               </div>
 
               {/* Content */}
               <div className="space-y-4">
-                <p className="text-muted-foreground text-center">
-                  {isDevelopment 
+                <p className="text-sm text-zinc-400 text-center leading-relaxed">
+                  {isDevelopment
                     ? 'reCAPTCHA is disabled in development mode.'
-                    : "You've reached the rate limit. Please verify you're human to continue:"}
+                    : "You've reached the rate limit. Verify you're human to continue."}
                 </p>
 
                 {/* reCAPTCHA Container */}
@@ -152,11 +153,9 @@ export default function CaptchaModal({
                     <button
                       onClick={handleDevBypass}
                       disabled={isLoading}
-                      className="px-6 py-3 bg-primary text-primary-foreground rounded-lg
-                               hover:bg-primary/90 transition-colors disabled:opacity-50
-                               font-semibold"
+                      className="inline-flex h-10 items-center justify-center rounded-xl bg-white px-5 text-xs font-semibold text-zinc-900 transition-colors duration-200 hover:bg-zinc-100 active:scale-[0.98] disabled:opacity-40"
                     >
-                      {isLoading ? 'Verifying...' : 'Continue (Dev Mode)'}
+                      {isLoading ? 'Verifying…' : 'Continue (dev mode)'}
                     </button>
                   </div>
                 ) : (
@@ -166,23 +165,22 @@ export default function CaptchaModal({
                 )}
 
                 {error && (
-                  <p className="text-sm text-destructive text-center">
+                  <p className="text-xs text-rose-400 text-center">
                     {error}
                   </p>
                 )}
 
                 {isLoading && (
-                  <div className="text-center text-sm text-muted-foreground">
-                    Verifying...
+                  <div className="text-center text-xs text-zinc-500">
+                    Verifying…
                   </div>
                 )}
 
-                <div className="pt-2">
+                <div className="pt-1">
                   <button
                     onClick={handleClose}
                     disabled={isLoading}
-                    className="w-full px-4 py-2 bg-secondary text-secondary-foreground rounded-lg
-                             hover:bg-secondary/80 transition-colors disabled:opacity-50"
+                    className="w-full h-10 rounded-xl border border-white/[0.08] bg-white/[0.03] text-xs font-medium text-zinc-300 transition-colors duration-200 hover:border-white/20 hover:text-white disabled:opacity-40"
                   >
                     Cancel
                   </button>

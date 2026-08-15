@@ -3,11 +3,6 @@ declare module '@/components/SearchBar' {
   export default SearchBar;
 }
 
-declare module '@/components/ThemeToggle' {
-  const ThemeToggle: React.FC;
-  export default ThemeToggle;
-}
-
 declare module '@/components/LoadingScreen' {
   const LoadingScreen: React.FC;
   export default LoadingScreen;

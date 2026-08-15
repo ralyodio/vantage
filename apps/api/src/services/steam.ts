@@ -1,11 +1,156 @@
 import axios from 'axios';
 import type { SteamProfile } from '@vantage/shared';
+import { steamId64ToAccountId } from '@vantage/shared';
 import { CS2Service } from './cs2';
 
 const STEAM_API_BASE = 'https://api.steampowered.com';
 
+const BROWSER_HEADERS = {
+  'User-Agent':
+    'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+  Accept: 'text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8',
+  'Accept-Language': 'en-US,en;q=0.9',
+};
+
+function parseMiniBackground(bg: any): SteamProfile['profileBackground'] | undefined {
+  if (!bg) return undefined;
+  if (typeof bg === 'string' && bg.startsWith('http')) {
+    return { image: bg };
+  }
+  if (typeof bg !== 'object') return undefined;
+
+  const image = bg.image || bg.poster || undefined;
+  const videoMp4 = bg['video/mp4'] || bg.mp4 || undefined;
+  const videoWebm = bg['video/webm'] || bg.webm || undefined;
+  if (!image && !videoMp4 && !videoWebm) return undefined;
+  return { image, videoMp4, videoWebm };
+}
+
+/**
+ * Full profile page background (has_profile_background / animated).
+ * This is the actual profile wallpaper — different from miniprofile hover bg.
+ */
+function parseProfilePageBackground(html: string): SteamProfile['profileBackground'] | undefined {
+  if (!html) return undefined;
+
+  // Animated background video block
+  const anim = html.match(
+    /class="profile_animated_background"[\s\S]{0,1200}?<\/div>/i
+  );
+  if (anim) {
+    const block = anim[0];
+    const poster = block.match(/poster="([^"]+)"/i)?.[1];
+    const webm = block.match(/src="([^"]+\.webm)"/i)?.[1];
+    const mp4 = block.match(/src="([^"]+\.mp4)"/i)?.[1];
+    if (poster || webm || mp4) {
+      return {
+        image: poster,
+        videoWebm: webm,
+        videoMp4: mp4,
+      };
+    }
+  }
+
+  // Static CSS background on .has_profile_background
+  // style="background-image: url( 'https://...' );"
+  const styleMatch =
+    html.match(
+      /has_profile_background[^>]*style="[^"]*background-image:\s*url\(\s*['"]?([^'")\s]+)['"]?\s*\)/i
+    ) ||
+    html.match(
+      /background-image:\s*url\(\s*['"]?(https:\/\/[^'")\s]+\/(?:community_assets\/images\/items|steamcommunity\/public\/images\/items)\/[^'")\s]+)['"]?\s*\)/i
+    );
+
+  if (styleMatch?.[1]) {
+    return { image: styleMatch[1].replace(/&amp;/g, '&') };
+  }
+
+  return undefined;
+}
+
 export class SteamService {
   private cs2Service = new CS2Service();
+
+  /**
+   * Public miniprofile JSON — avatar frame, mini bg, level class, favorite badge.
+   * No API key. accountId = steamId64 - 76561197960265728
+   */
+  private async getMiniProfile(steamId64: string): Promise<{
+    level?: number;
+    levelClass?: string;
+    avatarFrame?: string;
+    miniBackground?: SteamProfile['profileBackground'];
+    favoriteBadge?: SteamProfile['favoriteBadge'];
+    avatar?: string;
+  } | null> {
+    const accountId = steamId64ToAccountId(steamId64);
+    if (accountId == null) return null;
+    try {
+      const res = await axios.get(
+        `https://steamcommunity.com/miniprofile/${accountId}/json`,
+        {
+          timeout: 8000,
+          headers: BROWSER_HEADERS,
+        }
+      );
+      const d = res.data;
+      if (!d || typeof d !== 'object') return null;
+
+      const badge = d.favorite_badge;
+      const favoriteBadge =
+        badge && badge.name
+          ? {
+              name: String(badge.name),
+              xp: badge.xp != null ? String(badge.xp) : undefined,
+              level: badge.level != null ? Number(badge.level) : undefined,
+              description: badge.description ? String(badge.description) : undefined,
+              icon: badge.icon ? String(badge.icon) : undefined,
+            }
+          : undefined;
+
+      return {
+        level: d.level != null ? Number(d.level) : undefined,
+        levelClass: d.level_class ? String(d.level_class) : undefined,
+        avatarFrame: d.avatar_frame ? String(d.avatar_frame) : undefined,
+        miniBackground: parseMiniBackground(d.profile_background),
+        favoriteBadge,
+        avatar: d.avatar_url ? String(d.avatar_url) : undefined,
+      };
+    } catch (err) {
+      console.warn(`Steam miniprofile fetch failed for ${steamId64}:`, err);
+      return null;
+    }
+  }
+
+  /** Scrape equipped full-page profile background from the public profile HTML. */
+  private async getProfilePageBackground(
+    steamId64: string,
+    profileUrl?: string
+  ): Promise<SteamProfile['profileBackground'] | undefined> {
+    const urls = [
+      profileUrl,
+      `https://steamcommunity.com/profiles/${steamId64}/`,
+    ].filter(Boolean) as string[];
+
+    for (const url of urls) {
+      try {
+        const res = await axios.get(url, {
+          timeout: 10000,
+          headers: BROWSER_HEADERS,
+          maxRedirects: 5,
+          responseType: 'text',
+          // Steam sometimes returns gzip; axios handles decompress by default
+          validateStatus: (s) => s >= 200 && s < 400,
+        });
+        const html = typeof res.data === 'string' ? res.data : String(res.data ?? '');
+        const bg = parseProfilePageBackground(html);
+        if (bg) return bg;
+      } catch (err) {
+        console.warn(`Steam profile page scrape failed for ${url}:`, err);
+      }
+    }
+    return undefined;
+  }
 
   async getProfile(steamId64: string, apiKey?: string): Promise<SteamProfile> {
     const STEAM_API_KEY = apiKey || process.env.STEAM_API_KEY;
@@ -14,7 +159,8 @@ export class SteamService {
     }
     
     // Fetch ALL available data in parallel
-    const [summaryRes, bansRes, friendsRes, levelRes, ownedGamesRes, cs2StatsRes] = await Promise.all([
+    const [summaryRes, bansRes, friendsRes, levelRes, ownedGamesRes, cs2StatsRes, mini, pageBg] =
+      await Promise.all([
       axios.get(`${STEAM_API_BASE}/ISteamUser/GetPlayerSummaries/v2/`, {
         params: { key: STEAM_API_KEY, steamids: steamId64 },
       }),
@@ -33,6 +179,8 @@ export class SteamService {
       axios.get(`${STEAM_API_BASE}/ISteamUserStats/GetUserStatsForGame/v2/`, {
         params: { key: STEAM_API_KEY, steamid: steamId64, appid: '730' },
       }).catch(() => null),
+      this.getMiniProfile(steamId64),
+      this.getProfilePageBackground(steamId64),
     ]);
     
     const player = summaryRes.data.response?.players?.[0];
@@ -41,6 +189,8 @@ export class SteamService {
     if (!player) {
       throw new Error('Steam profile not found');
     }
+
+    const accountId = steamId64ToAccountId(steamId64) ?? undefined;
     
     // Calculate account age
     const accountCreated = player.timecreated 
@@ -54,8 +204,9 @@ export class SteamService {
     // Friend count
     const friendCount = friendsRes?.data?.friendslist?.friends?.length || undefined;
     
-    // Steam level
-    const level = levelRes?.data?.response?.player_level || undefined;
+    // Steam level (API + miniprofile fallback)
+    const level =
+      levelRes?.data?.response?.player_level ?? mini?.level ?? undefined;
     
     // Game count
     const gameCount = ownedGamesRes?.data?.response?.game_count || undefined;
@@ -118,12 +269,14 @@ export class SteamService {
     
     return {
       steamId64,
+      accountId,
       username: player.personaname,
       realName: player.realname,
-      avatar: player.avatarfull,
+      avatar: player.avatarfull || mini?.avatar,
       profileUrl: player.profileurl,
       accountCreated,
       level,
+      levelClass: mini?.levelClass,
       yearsOfService,
       isPrime: false, // Note: Prime status requires Game Coordinator access
       isPrivate: player.communityvisibilitystate !== 3,
@@ -135,6 +288,10 @@ export class SteamService {
       state: player.locstatecode,
       friendCount,
       gameCount,
+      avatarFrame: mini?.avatarFrame,
+      // Prefer full profile wallpaper; fall back to miniprofile hover background
+      profileBackground: pageBg || mini?.miniBackground,
+      favoriteBadge: mini?.favoriteBadge,
       cs2Stats: {
         hoursPlayed: cs2Game?.playtime_forever ? Math.floor(cs2Game.playtime_forever / 60) : cs2Stats?.hoursPlayed,
         hoursLast2Weeks: cs2Game?.playtime_2weeks ? Math.floor(cs2Game.playtime_2weeks / 60) : undefined,

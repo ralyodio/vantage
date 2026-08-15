@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { motion } from 'framer-motion';
+import { HiSearch } from 'react-icons/hi';
 
 interface SearchBarProps {
   onSearch: (query: string) => void;
@@ -8,53 +8,55 @@ interface SearchBarProps {
 
 export default function SearchBar({ onSearch, isLoading }: SearchBarProps) {
   const [query, setQuery] = useState('');
+  const [focused, setFocused] = useState(false);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (query.trim()) {
+    if (query.trim() && !isLoading) {
       onSearch(query.trim());
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative">
-      <motion.div
-        whileFocus={{ scale: 1.02 }}
-        className="relative"
+    <form onSubmit={handleSubmit} role="search">
+      <div
+        className={`flex items-center gap-2 rounded-2xl border bg-[#111113]/92 backdrop-blur-xl p-2 shadow-[0_8px_40px_rgba(0,0,0,0.5)] transition-colors duration-200 ${
+          focused ? 'border-white/25' : 'border-white/[0.08]'
+        }`}
       >
+        <HiSearch
+          className={`ml-2 w-5 h-5 shrink-0 transition-colors duration-200 ${
+            focused ? 'text-zinc-300' : 'text-zinc-600'
+          }`}
+        />
         <input
           type="text"
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Enter Steam Profile URL, ID, or Username..."
+          onFocus={() => setFocused(true)}
+          onBlur={() => setFocused(false)}
+          placeholder="Steam ID, vanity, or profile link…"
+          aria-label="Search player"
           disabled={isLoading}
-          className="w-full px-4 sm:px-6 py-3 sm:py-4 bg-card border-2 
-                   border-border rounded-lg 
-                   focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20
-                   text-foreground placeholder-muted-foreground text-base sm:text-lg
-                   disabled:opacity-50 disabled:cursor-not-allowed
-                   transition-all duration-200 shadow-sm"
+          spellCheck={false}
+          autoComplete="off"
+          className="min-w-0 flex-1 bg-transparent py-2.5 text-base text-zinc-100 placeholder-zinc-600 focus:outline-none disabled:opacity-50 sm:text-lg"
         />
-        
-        {isLoading && (
-          <div className="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2">
-            <div className="w-5 h-5 sm:w-6 sm:h-6 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-          </div>
-        )}
-      </motion.div>
-
-      <motion.button
-        type="submit"
-        disabled={!query.trim() || isLoading}
-        whileHover={{ scale: 1.05 }}
-        whileTap={{ scale: 0.95 }}
-        className="mt-3 sm:mt-4 w-full py-3 bg-primary text-primary-foreground font-bold rounded-lg
-                 hover:bg-primary/90 transition-colors shadow-md
-                 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-primary
-                 text-sm sm:text-base min-h-[44px] sm:min-h-0"
-      >
-        {isLoading ? 'ANALYZING...' : 'LOOKUP PLAYER'}
-      </motion.button>
+        <button
+          type="submit"
+          disabled={!query.trim() || isLoading}
+          className="inline-flex h-10 w-24 shrink-0 items-center justify-center gap-1.5 rounded-xl bg-white text-xs font-semibold text-zinc-900 transition-all duration-200 hover:bg-zinc-100 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 sm:w-28"
+        >
+          {isLoading ? (
+            <span className="h-4 w-4 shrink-0 animate-spin rounded-full border-2 border-zinc-400 border-t-zinc-900" />
+          ) : (
+            <HiSearch className="h-3.5 w-3.5 shrink-0" />
+          )}
+          <span className="tabular-nums">
+            {isLoading ? 'Working' : 'Lookup'}
+          </span>
+        </button>
+      </div>
     </form>
   );
 }

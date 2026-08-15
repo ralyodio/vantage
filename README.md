@@ -27,11 +27,11 @@
          poster="promo/showcase.gif"
          controls muted loop
          width="880"
-         alt="52-second Vantage walkthrough">
+         alt="45-second Vantage walkthrough">
   </video>
 </p>
 
-> 52-second walkthrough: search a suspect, watch the threat report build, dig into match forensics. No audio.
+> 45-second walkthrough: search a suspect, watch the threat report build, dig into match forensics. No audio.
 > Direct MP4: [`promo/showcase.mp4`](promo/showcase.mp4) · GIF: [`promo/showcase.gif`](promo/showcase.gif)
 
 ## Screenshots

@@ -1,0 +1,29 @@
+# Fly.io app config for the Vantage API.
+# Deploy: fly launch --no-deploy && fly secrets set ... && fly deploy
+# Docs: docs/DEPLOY.md
+
+app = "vantage-api"
+primary_region = "fra"
+
+[build]
+
+[env]
+  NODE_ENV = "production"
+  API_HOST = "0.0.0.0"
+  API_PORT = "3001"
+
+[http_service]
+  internal_port = 3001
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [http_service.concurrency]
+    type = "requests"
+    soft_limit = 180
+    hard_limit = 200
+
+[[vm]]
+  size = "shared-cpu-1x"
+  memory = "512mb"

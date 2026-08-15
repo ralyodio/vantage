@@ -5,7 +5,8 @@
     "outDir": "./dist",
     "module": "node16",
     "moduleResolution": "node16",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "noEmit": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist"]

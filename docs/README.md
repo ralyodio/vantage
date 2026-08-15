@@ -4,6 +4,7 @@
 
 | Doc | Contents |
 |-----|----------|
+| [DEPLOY.md](DEPLOY.md) | Production runbook: Vercel + Fly + Neon + Upstash, smoke tests |
 | [api.md](api.md) | REST reference: endpoints, auth, response shapes, caching, errors |
 | [risk-assessment.md](risk-assessment.md) | Threat model v2: families, weights, soft cap, ban floor |
 | [examples-sdks.md](examples-sdks.md) | curl, Node, Python clients for the API |

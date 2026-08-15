@@ -110,4 +110,4 @@ alias fix; flush as above or Refresh All.
 | `packages/shared/src` | Types, Steam resolver, threat calculator |
 | `prisma/schema.prisma` | Database schema |
 
-Next: [README](README.md) · [API docs](docs/api.md)
+Next: [README](README.md) · [API docs](docs/api.md) · [Deploy to production](docs/DEPLOY.md)
